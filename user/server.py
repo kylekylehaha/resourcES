@@ -7,6 +7,13 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-if __name__ == '__main__':
-    app.debug = True
-    app.run()
+@app.route('/sign_up.html', methods=['GET', 'POST'])
+def sign_up():
+    return render_template('sign_up.html')
+
+@app.route('/sign_in.html', methods=['GET', 'POST'])
+def sign_in():
+    return render_template('sign_in.html')
+
+app.debug = True
+app.run()
