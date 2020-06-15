@@ -14,14 +14,39 @@
 		<title>ResourcES</title>
    </head>
     <body>
+        {% if item_list %}
+            {% for i in item_list.keys()%}
 
-        <div class="r-ent">
-            <p>my homepage:{{content}}</p>
-        </div>
+                <table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+                    <tr>
+				        <th>器材名稱</th>
+                        <th>所屬人</th>
+                        <th>可續借次數</th>
+                        <th>一次可借用天數</th>
+                        <th>注意事項</th>
+			        </tr>
+                
+                    <th> {{i}} </th>
+                   
+                    {% for j in item_list[i] %}
+                        <th> {{j}} </th>
+                    {% endfor %}
 
-        {% for i in content%}
-            <li>name: {{ i }}</li>
-        {% endfor %}
+		        </table>
+            {% endfor %}
+
+        {% endif %}
+
+        <!--img src="./static/equip_img/apple-touch-icon-144x144-precomposed.png" alt="img"-->
+        <!--img src="{{ user_img }}" alt="img missing"-->
+
+		<select class="custom-select" id="sensor_list">
+            <option selected>select department</option>
+            {% for i in dept_list %}
+                <option value={{i}}>{{dept_list[i]}}</option>
+            {% endfor %}
+		</select>		
+
 
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
