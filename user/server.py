@@ -48,7 +48,7 @@ def sign_in():
 
 if __name__ == '__main__':
     #-----mysql connection-----
-    f = open("mysqlpasswd.txt",'r')
+    f = open("../server/mysqlpasswd.txt",'r')
     info=[]
     for line in f:
         line=line.strip('\n')
