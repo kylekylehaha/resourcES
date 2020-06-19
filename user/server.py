@@ -33,9 +33,11 @@ def sign_in():
         test_Ssn = request.values.get('Ssn')
         test_Password = request.values.get('Password')
         print (test_Password)
-        sql_check = "SELECT Password FROM USER WHERE Ssn LIKE %(Ssn)"
-        cursor.execute(sql_check, {'Ssn': test_Ssn})
-        data = cursor.fetchall()
+        
+        sql_select_query = "SELECT Password FROM USER WHERE Ssn = %s;"
+        cursor.execute(sql_select_query, test_Ssn)
+        data = cursor.fetchone()
+        print (data)
         if data is not None:
             if test_Password == data :
                 return 'Hello' + test_Ssn
