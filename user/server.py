@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
+import pymysql
 
 app = Flask(__name__)
-
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -10,16 +10,54 @@ def home():
 @app.route('/sign_up.html', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        return 'Hello' + request.values.get('user_id')
+        I_Name = request.values.get('Name')
+        I_Email = request.values.get('Email')
+        I_Ssn = request.values.get('Ssn')
+        I_Password = request.values.get('Password')
+        I_Department = request.values.get('Department')
+
+        insert_tuple = (I_Name, I_Email, I_Ssn, I_Password, I_Department, None, None)
+        print (insert_tuple)
+         
+        sql_insert_query = "INSERT into USER VALUES (%s, %s, %s, %s, %s, %s, %s);"
+        cursor.execute(sql_insert_query, insert_tuple) 
+        db.commit()
+        
+        return 'Hello' + request.values.get('Ssn') 
 
     return render_template('sign_up.html')
 
 @app.route('/sign_in.html', methods=['GET', 'POST'])
 def sign_in():
     if request.method == 'POST':
-        return 'Hello' + request.values.get('user_id')
+        test_Ssn = request.values.get('Ssn')
+        test_Password = request.values.get('Password')
+        print (test_Password)
+        sql_check = "SELECT Password FROM USER WHERE Ssn LIKE %(Ssn)"
+        cursor.execute(sql_check, {'Ssn': test_Ssn})
+        data = cursor.fetchall()
+        if data is not None:
+            if test_Password == data :
+                return 'Hello' + test_Ssn
+            else:
+                return 'Password is wrong. Please try again.'
+        else:
+            return 'There isn\'t exist your data. Please sign up first.'
 
     return render_template('sign_in.html')
 
-app.debug = True
-app.run()
+if __name__ == '__main__':
+    #-----mysql connection-----
+    db = pymysql.connect(
+         host='220.132.225.158',
+         port=8457,
+         user='winnie56233',
+         passwd='winnie1230',
+         db='ResourcES',
+         charset='utf8'
+    )
+
+    #-----create cursor object-----
+    cursor = db.cursor()
+    app.debug = True
+    app.run(host="0.0.0.0", port=11290)
