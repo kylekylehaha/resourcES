@@ -48,15 +48,20 @@ def sign_in():
 
 if __name__ == '__main__':
     #-----mysql connection-----
-    db = pymysql.connect(
-         host='220.132.225.158',
-         port=8457,
-         user='winnie56233',
-         passwd='winnie1230',
-         db='ResourcES',
-         charset='utf8'
-    )
+    f = open("mysqlpasswd.txt",'r')
+    info=[]
+    for line in f:
+        line=line.strip('\n')
+        info.append(line)
 
+    db = pymysql.connect(
+        host=info[0],
+        port=int(info[1]),
+        user=info[2],
+        passwd=info[3],
+        db='ResourcES',
+        charset='utf8'
+    )
     #-----create cursor object-----
     cursor = db.cursor()
     app.debug = True
