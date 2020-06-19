@@ -18,24 +18,99 @@
             {% for i in item_list.keys()%}
 
                 <table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
-                    <tr>
-				        <th>器材名稱</th>
-                        <th>所屬人</th>
-                        <th>可續借次數</th>
-                        <th>一次可借用天數</th>
-                        <th>注意事項</th>
-			        </tr>
+                    {% if item_list[i][5] == 'No'%}
+                        <tr>
+				            <th>器材名稱</th>
+                            <th>所屬人</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>是否可借用</th>
+                            <th>已預約人數</th>
+                            <th>到期日</th>
+                            <th>預約</th>
+			            </tr>
                 
-                    <th> {{i}} </th>
+                        <tr>
+                            <th> {{i}} </th>
                    
-                    {% for j in item_list[i] %}
-                        <th> {{j}} </th>
-                    {% endfor %}
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
 
+                            <th>
+                                <button id={{item_list[i][4]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Reservation</button>
+                            </th>
+                    {% else %}
+                        <tr>
+				            <th>器材名稱</th>
+                            <th>所屬人</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>是否可借用</th>
+                            <th>借用</th>
+			            </tr>
+                
+                        <tr>
+                            <th> {{i}} </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
+
+                            <th>
+                                <button id={{item_list[i][4]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Borrow</button>
+                            </th>
+                        </tr>
+                    {% endif %}
 		        </table>
-            {% endfor %}
 
+                <img src={{photo_list[i]}} alt='photo missing'>
+            {% endfor %}
         {% endif %}
+
+ 
+        <!--jump out window-->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">New</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="recipient-name" class="col-form-label">器材編號:</label>
+                                <input disabled type="text" class="form-control" id="recipient-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="col-form-label">預約: </label>
+
+								<div class="radio">
+      							    <input required type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                                    <label for="options1">確認預約</label>
+								</div>
+								<div class="radio">
+      							    <input required type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                    <label for="options2">先不要預約</label>
+								</div> 
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="confirm-button" type="submit" class="btn btn-success">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!--img src="./static/equip_img/apple-touch-icon-144x144-precomposed.png" alt="img"-->
         <!--img src="{{ user_img }}" alt="img missing"-->

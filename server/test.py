@@ -17,13 +17,16 @@ print(ans[0])
 '''
 t = ((0, 2, 'E94056233', 'Arduino UNO', 'Be careful', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Arduino_Uno_-_R3.jpg/220px-Arduino_Uno_-_R3.jpg', 'ael2m', 30), (1, 2, 'E94056233', 'L298N', 'Be Careful', 'https://www.botsheet.com/cht/wp-content/uploads/l298n-motor-driver-module-01.jpeg', 'Ddl3i', 30))
 
+t = ((1, 2, 'E94056233', 'Arduino UNO', 'Be careful', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Arduino_Uno_-_R3.jpg/220px-Arduino_Uno_-_R3.jpg', 'ael23', 30, 'aaaa0', 'E94051021', 'ael23', datetime.datetime(2020, 6, 18, 21, 3, 17), datetime.datetime(2019, 12, 30, 0, 0), 2, 0), (1, 3, 'E94051136', 'arduino', None, 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Arduino_Uno_-_R3.jpg/220px-Arduino_Uno_-_R3.jpg', 'eMb89', 30, None, None, None, None, None, None, None)) 
+
 item_list={}
 for i in t:
-    if i[0] == 1:
-        item_list[i[3]] = [i[1],i[7],i[4],i[5]]
-print(item_list)
+    print(i)
+	#if i[0] == 1:
+        #item_list[i[3]] = [i[1],i[7],i[4],i[5]]
+#print(item_list)
 
-for i in item_list.keys():
-    print(item_list[i][0])
+#for i in item_list.keys():
+#    print(item_list[i][0])
 
 
