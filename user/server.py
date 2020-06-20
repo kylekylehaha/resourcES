@@ -23,7 +23,7 @@ def sign_up():
         cursor.execute(sql_insert_query, insert_tuple) 
         db.commit()
         
-        return 'Hello' + request.values.get('Ssn') 
+        return render_template('member.html') 
 
     return render_template('sign_up.html')
 
@@ -36,15 +36,17 @@ def sign_in():
         
         sql_select_query = "SELECT Password FROM USER WHERE Ssn = %s;"
         cursor.execute(sql_select_query, test_Ssn)
-        data = cursor.fetchone()
-        print (data)
+        data = cursor.fetchall()
+        S_data = data[0][0]
         if data is not None:
-            if test_Password == data :
-                return 'Hello' + test_Ssn
+            if test_Password == S_data :
+                return render_template('member.html')
             else:
-                return 'Password is wrong. Please try again.'
+                flash('Password is wrnog. Please try again')
+                return render_template('sign_in.html')
         else:
-            return 'There isn\'t exist your data. Please sign up first.'
+            flash('There isn\'t exist your data. Please sign up first')
+            return render_template('sign_up.html')
 
     return render_template('sign_in.html')
 
