@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
+import pymysql
 
 app = Flask(__name__)
-
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -10,16 +10,63 @@ def home():
 @app.route('/sign_up.html', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        return 'Hello' + request.values.get('user_id')
+        I_Name = request.values.get('Name')
+        I_Email = request.values.get('Email')
+        I_Ssn = request.values.get('Ssn')
+        I_Password = request.values.get('Password')
+        I_Department = request.values.get('Department')
+
+        insert_tuple = (I_Name, I_Email, I_Ssn, I_Password, I_Department, None, None)
+        print (insert_tuple)
+         
+        sql_insert_query = "INSERT into USER VALUES (%s, %s, %s, %s, %s, %s, %s);"
+        cursor.execute(sql_insert_query, insert_tuple) 
+        db.commit()
+        
+        return render_template('member.html') 
 
     return render_template('sign_up.html')
 
 @app.route('/sign_in.html', methods=['GET', 'POST'])
 def sign_in():
     if request.method == 'POST':
-        return 'Hello' + request.values.get('user_id')
+        test_Ssn = request.values.get('Ssn')
+        test_Password = request.values.get('Password')
+        print (test_Password)
+        
+        sql_select_query = "SELECT Password FROM USER WHERE Ssn = %s;"
+        cursor.execute(sql_select_query, test_Ssn)
+        data = cursor.fetchall()
+        S_data = data[0][0]
+        if data is not None:
+            if test_Password == S_data :
+                return render_template('member.html')
+            else:
+                flash('Password is wrnog. Please try again')
+                return render_template('sign_in.html')
+        else:
+            flash('There isn\'t exist your data. Please sign up first')
+            return render_template('sign_up.html')
 
     return render_template('sign_in.html')
 
-app.debug = True
-app.run()
+if __name__ == '__main__':
+    #-----mysql connection-----
+    f = open("../server/mysqlpasswd.txt",'r')
+    info=[]
+    for line in f:
+        line=line.strip('\n')
+        info.append(line)
+
+    db = pymysql.connect(
+        host=info[0],
+        port=int(info[1]),
+        user=info[2],
+        passwd=info[3],
+        db='ResourcES',
+        charset='utf8'
+    )
+    #-----create cursor object-----
+    cursor = db.cursor()
+    app.debug = True
+    app.run(host="0.0.0.0", port=11290)
