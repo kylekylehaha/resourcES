@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<!--
+	Intensify by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>resourcES</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+	</head>
+	<body class="subpage">
+
+		<!-- Header -->
+			<header id="header">
+				<nav class="left">
+                    <a href="{{ url_for('mall') }}" class="button alt">器材城</a>
+				</nav>
+                <a href="{{ url_for('home') }}" class="logo">resourcES</a>
+				<nav class="right">
+					<a href="#" class="button alt">Log in</a>
+				</nav>
+			</header>
+
+		<!-- Main -->
+				<div class="inner">
+
+					<!-- Elements -->
+						<h2 id="elements"></h2>
+						<div class="row 200%">
+							<div class="12u">
+
+								<!-- Table -->
+									<h3>正在租用的器材</h3>
+
+									<h4></h4>
+									<div class="table-wrapper">
+										<table>
+											<thead>
+												<tr>
+													<th>器材名稱</th>
+                                                    <th>Rank</th>
+													<th>借出日期</th>
+													<th>到期時間</th>
+                                                    <th>已續借次數</th>
+                                                    <th>訂單狀態</th>
+												</tr>
+											</thead>
+											<tbody>
+                                                {% for i in borrow_list %}
+												<tr>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+                                                {% endfor %}
+											</tbody>
+										</table>
+									</div>
+
+							</div>
+							<div class="12u">
+
+								<!-- Form -->
+									<h3></h3>
+
+                                    <form method="post" action="{{ url_for('search') }}">
+										<div class="row uniform">
+											<div class="9u 12u$(small)">
+												<input type="text" name="search_query" id="search_query" value="" placeholder="Search equiment" />
+											</div>
+											<div class="3u$ 12u$(small)">
+												<input type="submit" value="Search" class="fit" />
+											</div>
+										</div>
+									</form>
+
+							</div>
+                            <div class="12u">
+                                    <a href="#" class="button special" style="margin-right:20%;margin-left:25%"> 管理出借器材 </a>
+                                    <a href="#" class="button"> 查看租用中器材  </a>
+                            </div>
+						</div>
+
+				</div>
+
+		<!-- Scripts -->
+			<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/jquery.scrolly.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/skel.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/util.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+	</body>
+</html>
