@@ -51,8 +51,8 @@
 											<tbody>
                                                 {% for i in range(borrow_list | length) %}
                                                 <tr>
-                                                    {% for j in range(borrow_list[i] | length) %}
-                                                    <td>{{borrow_list[i][j]}}</td>
+                                                    {% for j in range(6) %}
+                                                        <td>{{borrow_list[i][j]}}</td>
                                                     {% endfor %}
                                                 </tr>
                                                 {% endfor %}
@@ -80,7 +80,7 @@
 							</div>
                             <div class="12u">
                                     <a href="#" class="button special" style="margin-right:20%;margin-left:25%"> 管理出借器材 </a>
-                                    <a href="{{ url_for('borrowing', Name=Name)" class="button"> 查看租用中器材  </a>
+                                    <a href="" class="button"> 查看租用中器材  </a>
                             </div>
 						</div>
 
