@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<!--
+	Intensify by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>resourcES</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+	</head>
+	<body class="subpage">
+
+		<!-- Header -->
+			<header id="header">
+				<nav class="left">
+				</nav>
+				<a href="index.html" class="logo">resourcES</a>
+				<nav class="right">
+					<a href="#" class="button alt">Log out</a>
+				</nav>
+			</header>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>出租器材</h1>
+						<p>輕鬆管理您出租的器材 </p>
+					</header>
+
+					<hr class="major" />
+
+					<!-- Elements -->
+						<div class="row 200%">
+							<div class="12u">
+
+								<!-- Form -->
+									<h3>出借器材</h3>
+
+									<form method="post" action="#">
+										<div class="row uniform">
+											<div class="6u 12u$(xsmall)">
+												<input type="text" name="Ename" id="name" value="" placeholder="器材名稱" />
+											</div>
+											<div class="6u$ 12u$(xsmall)">
+												<input type="email" name="Ephoto" id="email" value="" placeholder="照片(網址)" />
+											</div>
+											<!-- Break -->
+											<div class="12u$">
+												<div class="select-wrapper">
+													<select name="Renewal-limit" id="category">
+														<option value="">可續借次數</option>
+														<option value="0">0</option>
+														<option value="1">1</option>
+														<option value="2">2</option>
+														<option value="3">3</option>
+														<option value="4">4</option>
+														<option value="5">5</option>
+														<option value="6">6</option>
+														<option value="7">7</option>
+														<option value="8">8</option>
+														<option value="9">9</option>
+														<option value="10">10</option>
+													</select>
+												</div>
+											</div>
+											<div class="12u$">
+												<div class="select-wrapper">
+													<select name="Loan-period" id="category">
+														<option value="">可借用幾天/次</option>
+														<option value="1">1</option>
+														<option value="2">2</option>
+														<option value="3">3</option>
+														<option value="4">4</option>
+														<option value="5">5</option>
+														<option value="6">6</option>
+														<option value="7">7</option>
+														<option value="8">8</option>
+														<option value="9">9</option>
+														<option value="10">10</option>
+														<option value="11">11</option>
+														<option value="12">12</option>
+														<option value="13">13</option>
+														<option value="14">14</option>
+														<option value="15">15</option>
+														<option value="16">16</option>
+														<option value="17">17</option>
+														<option value="18">18</option>
+														<option value="19">19</option>
+														<option value="20">20</option>
+														<option value="21">21</option>
+														<option value="22">22</option>
+														<option value="23">23</option>
+														<option value="24">24</option>
+														<option value="25">25</option>
+														<option value="26">26</option>
+														<option value="27">27</option>
+														<option value="28">28</option>
+														<option value="29">29</option>
+														<option value="30">30</option>
+													</select>
+												</div>
+											</div>
+											
+											<!-- Break -->
+											<div class="6u 12u$(small)">
+												<input type="checkbox" id="copy" name="copy">
+												<label for="copy">該器材目前提供外界</label>
+											</div>
+											<div class="6u$ 12u$(small)">
+												<input type="checkbox" id="human" name="human" checked>
+												<label for="human">該器材目前不提供外界</label>
+											</div>
+											<!-- Break -->
+											<div class="12u$">
+												<textarea name="Notice" id="message" placeholder="注意事項(若無請寫無)" rows="6"></textarea>
+											</div>
+											<!-- Break -->
+											<div class="12u$">
+												<ul class="actions">
+													<li><input type="submit" value="Send form" /></li>
+													<li><input type="reset" value="Reset" class="alt" /></li>
+												</ul>
+											</div>
+										</div>
+									</form>
+
+									<hr />
+							</div>
+							<div class="12u">
+								<!-- Table -->
+									<h3>目前已出租的器材</h3>
+
+									<div class="table-wrapper">
+										<table>
+											<thead>
+												<tr>
+													<th>器材名稱</th>
+													<th>可續借次數</th>
+													<th>可借用幾天/次</th>
+													<th>注意事項</th>
+													<th>更改權限</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Item 1</td>
+													<td>Ante turpis integer aliquet porttitor.</td>
+													<td>29.99</td>
+													<td>記得不要用摔的</td>
+													<td>
+														<input type="checkbox" id="copy" name="copy">
+														<label for="copy">該器材目前提供外界</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Item 2</td>
+													<td>Vis ac commodo adipiscing arcu aliquet.</td>
+													<td>19.99</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+							</div>
+							
+						</div>
+				</div>
+			</section>
+		<!-- Scripts -->
+			<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/jquery.scrolly.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/skel.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/util.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+	</body>
+</html>
