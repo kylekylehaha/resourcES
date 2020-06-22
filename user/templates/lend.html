@@ -16,8 +16,9 @@
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
+                    <a href="{{ url_for('mall', Name=Name) }}" class="button alt">器材城</a>
 				</nav>
-				<a href="index.html" class="logo">resourcES</a>
+                <a href="{{ url_for('home') }}" class="logo">resourcES</a>
 				<nav class="right">
 					<a href="#" class="button alt">Log out</a>
 				</nav>
@@ -46,12 +47,12 @@
 												<input type="text" name="Ename" id="name" value="" placeholder="器材名稱" />
 											</div>
 											<div class="6u$ 12u$(xsmall)">
-												<input type="email" name="Ephoto" id="email" value="" placeholder="照片(網址)" />
+												<input type="text" name="Ephoto" id="name" value="" placeholder="照片(網址)" />
 											</div>
 											<!-- Break -->
 											<div class="12u$">
 												<div class="select-wrapper">
-													<select name="Renewal-limit" id="category">
+													<select name="Renewal_limit" id="category">
 														<option value="">可續借次數</option>
 														<option value="0">0</option>
 														<option value="1">1</option>
@@ -69,7 +70,7 @@
 											</div>
 											<div class="12u$">
 												<div class="select-wrapper">
-													<select name="Loan-period" id="category">
+													<select name="Loan_period" id="category">
 														<option value="">可借用幾天/次</option>
 														<option value="1">1</option>
 														<option value="2">2</option>
@@ -107,11 +108,11 @@
 											
 											<!-- Break -->
 											<div class="6u 12u$(small)">
-												<input type="checkbox" id="copy" name="copy">
+												<input type="checkbox" id="copy" name="Y_outside">
 												<label for="copy">該器材目前提供外界</label>
 											</div>
 											<div class="6u$ 12u$(small)">
-												<input type="checkbox" id="human" name="human" checked>
+												<input type="checkbox" id="human" name="N_outside">
 												<label for="human">該器材目前不提供外界</label>
 											</div>
 											<!-- Break -->
@@ -146,21 +147,17 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr>
-													<td>Item 1</td>
-													<td>Ante turpis integer aliquet porttitor.</td>
-													<td>29.99</td>
-													<td>記得不要用摔的</td>
-													<td>
-														<input type="checkbox" id="copy" name="copy">
-														<label for="copy">該器材目前提供外界</label>
-													</td>
-												</tr>
-												<tr>
-													<td>Item 2</td>
-													<td>Vis ac commodo adipiscing arcu aliquet.</td>
-													<td>19.99</td>
-												</tr>
+                                                {% for i in range(equip_list | length) %}
+                                                <tr>
+                                                    {% for j in range(4) %}
+                                                    <td>{{equip_list[i][j]}}</td>
+                                                    {% endfor %}
+                                                    <td>
+                                                        <input type="checkbox" id="copy" name=change>
+                                                        <label for="change"> 該器材目前提供外借 </label>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
 											</tbody>
 										</table>
 									</div>

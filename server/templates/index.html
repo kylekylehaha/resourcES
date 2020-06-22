@@ -11,65 +11,86 @@
         <!--link css file-->
         <link rel="stylesheet" href="../static/css/index.css">
 
+        <!--jquery confirm-->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
 		<title>ResourcES</title>
    </head>
     <body>
+		<!--器材城-->
+		<nav id="nav_bar" class="navbar navbar-dark bg-dark justify-content-between">
+			<a class="navbar-brand" id="nav_bar_title" href="http://winnieliu.ddns.net:11230/mall">ResourcES</a>
+			<form class="form-inline">
+				<input id="search_input" class="form-control mr-sm-2" type="search" placeholder="Keyword" aria-label="Search">
+    			<button id="search_button" class="btn btn-outline-success my-2 my-sm-0" type="button">Search</button>
+  			</form>
+		</nav>
+
         {% if item_list %}
             {% for i in item_list.keys()%}
 
                 <table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
-                    {% if item_list[i][5] == 'No'%}
+                    {% if item_list[i][6] == '需預約'%}
                         <tr>
+                            <th>器材照片</th>
 				            <th>器材名稱</th>
                             <th>所屬人</th>
                             <th>可續借次數</th>
                             <th>一次可借用天數</th>
                             <th>注意事項</th>
                             <th>器材編號</th>
-                            <th>是否可借用</th>
+                            <th>狀態</th>
                             <th>已預約人數</th>
-                            <th>到期日</th>
+                            <th>目前借用人到期日</th>
                             <th>預約</th>
 			            </tr>
-                
+
                         <tr>
-                            <th> {{i}} </th>
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
                    
                             {% for j in item_list[i] %}
                                 <th> {{j}} </th>
                             {% endfor %}
 
                             <th>
-                                <button id={{item_list[i][4]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Reservation</button>
+                                <button id={{item_list[i][5]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Reservation</button>
                             </th>
                     {% else %}
                         <tr>
+                            <th>器材照片</th>
 				            <th>器材名稱</th>
                             <th>所屬人</th>
                             <th>可續借次數</th>
                             <th>一次可借用天數</th>
                             <th>注意事項</th>
                             <th>器材編號</th>
-                            <th>是否可借用</th>
+                            <th>狀態</th>
                             <th>借用</th>
 			            </tr>
                 
                         <tr>
-                            <th> {{i}} </th>
-                   
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
+
                             {% for j in item_list[i] %}
                                 <th> {{j}} </th>
                             {% endfor %}
 
                             <th>
-                                <button id={{item_list[i][4]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Borrow</button>
+                                <button id={{item_list[i][5]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Borrow</button>
                             </th>
                         </tr>
                     {% endif %}
 		        </table>
 
-                <img src={{photo_list[i]}} alt='photo missing'>
             {% endfor %}
+        
+        {% else %}
+            <p>查無資料</p>    
+
         {% endif %}
 
  
@@ -92,12 +113,19 @@
                             <div class="form-group">
                                 <label for="message-text" class="col-form-label">預約: </label>
 
+								<!--div class="form-check">
+									<input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+									<label class="form-check-label" for="exampleRadios1">
+										Default radio
+  									</label>
+								</div-->
+
 								<div class="radio">
-      							    <input required type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+      							    <input checked type="radio" name="optionsRadios" id="optionsRadios1" value="yes">
                                     <label for="options1">確認預約</label>
 								</div>
 								<div class="radio">
-      							    <input required type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+      							    <input type="radio" name="optionsRadios" id="optionsRadios2" value="no">
                                     <label for="options2">先不要預約</label>
 								</div> 
                             </div>
@@ -115,12 +143,13 @@
         <!--img src="./static/equip_img/apple-touch-icon-144x144-precomposed.png" alt="img"-->
         <!--img src="{{ user_img }}" alt="img missing"-->
 
-		<select class="custom-select" id="sensor_list">
+
+		<!--select class="custom-select" id="sensor_list">
             <option selected>select department</option>
             {% for i in dept_list %}
                 <option value={{i}}>{{dept_list[i]}}</option>
             {% endfor %}
-		</select>		
+		</select-->		
 
 
 		<!-- Optional JavaScript -->
@@ -128,6 +157,9 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <!--jquery confirm-->
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 
 		<!--icons-->
 		<script src="https://kit.fontawesome.com/af046df13d.js" crossorigin="anonymous"></script>

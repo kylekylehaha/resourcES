@@ -146,6 +146,55 @@ def borrowing(Name):
     
     return render_template('borrowing.html', borrow_list = borrow_list, Name=Name)
 
+@app.route('/lend/<Name>', methods=['GET', 'POST'])
+def lend(Name):
+    #----- select Ssn -----
+    sql_select_Ssn_query = "SELECT Ssn FROM USER WHERE Name = %s;"
+    cursor.execute(sql_select_Ssn_query, Name)
+    data_Ssn = cursor.fetchall()
+    Ssn = data_Ssn[0][0]
+
+    #----- receive new resources to insert into DB------
+    I_Ename = request.values.get('Ename')
+    I_Ephoto = request.values.get('Ephoto')
+    I_Renewal_limit = request.values.get('Renewal_limit')
+    I_Loan_period = request.values.get('Loan_period')
+    Y_outside = request.values.get('Y_outside')
+    N_outside = request.values.get('N_outside')
+    I_Notice = request.values.get('Notice')
+    if Y_outside == 'on':
+        I_Flag = 1
+    else:
+        I_Flag = 0
+
+    I_Enum = GenerateCode(3, 2)
+    print (I_Renewal_limit)
+    #----- insert new resources -----
+    sql_insert_query = "INSERT into RESOURCES VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+    val = (I_Flag, I_Renewal_limit, Ssn, I_Ename, I_Notice, I_Ephoto, I_Loan_period, I_Enum)
+    cursor.execute(sql_insert_query,val) 
+    db.commt()
+    #----- select lended equipment ------
+    sql_select_lended_equip_query = "SELECT Enum, Renewal_limit, Loan_period, Notice FROM RESOURCES WHERE Ssn = %s;"
+    cursor.execute(sql_select_lended_equip_query, Ssn)
+    data_equip = cursor.fetchall()
+
+
+    #-----create equip_list -----
+    equip_list = [[None for x in range(4)]for y in range(len(data_equip))]
+    for i in range(len(data_equip)):
+        for j in range(len(data_equip[i])):
+            equip_list[i][j] = data_equip[i][j]
+
+    #----- select Ename -----
+    for i in range(len(equip_list)):
+        sql_select_Ename_query = "SELECT Ename FROM RESOURCES WHERE Enum = %s;"
+        cursor.execute(sql_select_Ename_query, equip_list[i][0])
+        data_Ename = cursor.fetchall()
+        equip_list[i][0] = data_Ename[0][0]
+
+    return render_template('lend.html', Name=Name, equip_list=equip_list)
+
 #----- other function -----
 def GenerateCode(l,n):
     #l: number of letters
