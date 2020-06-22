@@ -90,8 +90,8 @@ def member_info(Name):
     S_Dname = data_dept[0][0]
     return render_template('member_info.html', Name=S_Name, Ssn=S_Ssn, Dept=S_Dname, Email=S_Email, Violation=S_Violation )
     
-@app.route('/mall', methods=['GET'])
-def mall():
+@app.route('/mall/<Name>', methods=['GET'])
+def mall(Name):
     #----- equiment mall homepage -----
     cursor.execute("SELECT Dnum, Dname FROM DEPARTMENT")
     data = cursor.fetchall()
@@ -116,10 +116,33 @@ def mall():
 @app.route('/add',methods=['GET'])
 def Add():
     return "ok"
+@app.route('/search', methods=['POST'])
+def search():
+    return "search function"
 
-@app.route('/borrowing')
-def borrowing():
-    return render_template('borrowing.html')
+
+@app.route('/borrowing/<Name>')
+def borrowing(Name):
+    sql_select_Ssn_query = "SELECT Ssn FROM USER WHERE Name = %s;"
+    cursor.execute(sql_select_Ssn_query, Name)
+    data = cursor.fetchall()
+    Ssn = data[0][0]
+    sql_select_borrow_query = "SELECT Enum, Rank, Date_out, Due_Date, Renewal_times, Order_status FROM BORROW WHERE Ssn = %s;"
+    cursor.execute(sql_select_borrow_query, Ssn)
+    data_borrow = cursor.fetchall()
+
+    borrow_list = [[None for x in range(6)]for y in range(len(data_borrow))]
+    
+    for i in range(len(data_borrow)):
+        for j in range(len(data_borrow[i])):
+            borrow_list[i][j] = data_borrow[i][j]
+
+    for i in range(len(borrow_list)):
+        sql_select_Ename_query = "SELECT Ename FROM RESOURCES WHERE Enum = %s;"
+        cursor.execute(sql_select_Ename_query, borrow_list[i][0])
+        data_Ename = cursor.fetchone()
+        borrow_list[i][0] = data_Ename[0]
+    return render_template('borrowing.html', borrow_list = borrow_list)
 
 #----- other function -----
 def GenerateCode(l,n):

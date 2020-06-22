@@ -16,11 +16,11 @@
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
-                    <a href="{{ url_for('mall') }}" class="button alt">器材城</a>
+                    <a href="{{ url_for('mall', Name=Name) }}" class="button alt">器材城</a>
 				</nav>
                 <a href="{{ url_for('home') }}" class="logo">resourcES</a>
 				<nav class="right">
-					<a href="#" class="button alt">Log in</a>
+					<a href="#" class="button alt">Log out</a>
 				</nav>
 			</header>
 
@@ -49,31 +49,12 @@
 												</tr>
 											</thead>
 											<tbody>
-                                                {% for i in borrow_list %}
-												<tr>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
-												<tr>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
-												<tr>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
+                                                {% for i in range(borrow_list | length) %}
+                                                <tr>
+                                                    {% for j in range(borrow_list[i] | length) %}
+                                                    <td>{{borrow_list[i][j]}}</td>
+                                                    {% endfor %}
+                                                </tr>
                                                 {% endfor %}
 											</tbody>
 										</table>
@@ -99,7 +80,7 @@
 							</div>
                             <div class="12u">
                                     <a href="#" class="button special" style="margin-right:20%;margin-left:25%"> 管理出借器材 </a>
-                                    <a href="#" class="button"> 查看租用中器材  </a>
+                                    <a href="{{ url_for('borrowing', Name=Name)" class="button"> 查看租用中器材  </a>
                             </div>
 						</div>
 
