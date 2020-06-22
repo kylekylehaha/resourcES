@@ -136,12 +136,14 @@ def borrowing(Name):
     for i in range(len(data_borrow)):
         for j in range(len(data_borrow[i])):
             borrow_list[i][j] = data_borrow[i][j]
-
+    
+    # ----- select Ename -----
     for i in range(len(borrow_list)):
         sql_select_Ename_query = "SELECT Ename FROM RESOURCES WHERE Enum = %s;"
         cursor.execute(sql_select_Ename_query, borrow_list[i][0])
-        data_Ename = cursor.fetchone()
-        borrow_list[i][0] = data_Ename[0]
+        data_Ename = cursor.fetchall()
+        borrow_list[i][0] = data_Ename[0][0]
+    
     return render_template('borrowing.html', borrow_list = borrow_list)
 
 #----- other function -----
