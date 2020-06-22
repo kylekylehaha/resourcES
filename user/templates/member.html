@@ -9,73 +9,32 @@
 		<title>resourcES</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+		<link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/main.css') }}" />
 	</head>
 	<body>
 
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
+                    <a href="{{ url_for('mall') }}" class="button alt">器材城</a>
 				</nav>
 				<a href="index.html" class="logo">resourcES</a>
 				<nav class="right">
-					<a href="sign_in.html" class="button alt">Log in</a>
+                    <a href="{{ url_for('member_info', Name=Name) }}" class="button alt">會員資料</a>
+					<a href="" class="button alt">購物車</a>
+					<a href="" class="button alt">通知</a>
+
 				</nav>
 			</header>
 
 		<!-- Banner -->
 			<section id="banner">
 				<div class="content">
-					<h1>resourcES</h1>
-					<p>一個整合租借流程的平台.</p>
+                    <h1>Hello!  {{Name}}</h1>
+                    <p></p>
 					<ul class="actions">
 
 					</ul>
-				</div>
-			</section>
-
-		<!-- One -->
-			<section id="one" class="wrapper">
-				<div class="inner flex flex-3">
-					<div class="flex-item left">
-						<div>
-							<h3>完整的預約系統和懲罰機制</h3>
-							<p>讓你輕鬆預約想租用的器材。<br /> 懲罰機制培養良善的預約習慣。</p>
-						</div>
-						<div>
-							<h3>清楚的查閱界面</h3>
-							<p>有了查閱界面，可以清楚知道 <br /> 剩餘的器材數量，以及借用狀況。</p>
-						</div>
-					</div>
-					<div class="flex-item image fit round">
-						<img src="{{ url_for('static', filename='images/feature.png') }}" alt="" />
-					</div>
-					<div class="flex-item right">
-						<div>
-							<h3>上傳欲開放的資源</h3>
-							<p>你可以上傳自己想開放的器材給大家，<br />達到時下所謂的"共享" 資源。.</p>
-						</div>
-						<div>
-							<h3>嚴格且清晰的權限機制</h3>
-							<p>你可以限制租用者的權限，<br /> 可以確保使用者的品質。.</p>
-						</div>
-					</div>
-				</div>
-			</section>
-
-		<!-- Two -->
-			<section id="two" class="wrapper style1 special">
-				<div class="inner">
-					<h2>關於我們</h2>
-					<figure>
-					    <blockquote>
-						   此產品為國立成功大學 工程科學系 資料庫系統的作業。 <br />
-						   指導教授: 鄧維光教授
-					    </blockquote>
-					    <footer>
-
-					    </footer>
-					</figure>
 				</div>
 			</section>
 
