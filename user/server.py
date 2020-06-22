@@ -155,6 +155,7 @@ def lend(Name):
     Ssn = data_Ssn[0][0]
 
     #----- receive new resources to insert into DB------
+    if request
     I_Ename = request.values.get('Ename')
     I_Ephoto = request.values.get('Ephoto')
     I_Renewal_limit = request.values.get('Renewal_limit')
