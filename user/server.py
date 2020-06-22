@@ -71,16 +71,6 @@ def sign_in():
 def member(Name):
     return render_template('member.html', Name = Name)
 
-@app.route('/search', methods=['GET', 'POST'])
-#----- search interface -----
-def search():
-    if request.method == 'POST':
-        search_item = request.values.get('search_query')
-        print (search_item)
-        #----- Add winnie's search fucntion -----
-        return 'Found' + search_item
-    return render_template('search.html')
-
 @app.route('/member_info/<Name>')
 #----- member information -----
 def member_info(Name):
@@ -125,39 +115,11 @@ def mall():
 
 @app.route('/add',methods=['GET'])
 def Add():
-    #-----required data from url-----
-    addtype = request.values.get('type') #reservation or borrow
-    value = request.values.get('value') # yes or no
-    ssn = request.values.get('ssn') #student id
-    enum = request.values.get('enum') #equipment number
-    
-    if value == "yes":
-        if addtype == 'Reservation':
-            print("reservation")
-            cursor.execute('SELECT MAX(Rank) FROM RESERVATION WHERE Enum = %s',(enum))
-            data = int(cursor.fetchone()[0])
-            print(type(data))
-            
-            try:
-                cursor.execute('INSERT INTO RESERVATION(Ssn, Rank, Enum) VALUES (%s, %s, %s)',(ssn, data+1, enum))
-                db.commit()
-                print("commit finish")
-            except pymysql.Error as e:
-                print("Error %d: %s" % (e.args[0], e.args[1]))
-                if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
-                    return("duplicated")
-        if addtype == 'Borrow':
-            print("borrow")
-            order_num = GenerateCode(4,1)
-            print(enum)
-            try:
-                cursor.execute('INSERT INTO BORROW VALUES(%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn, enum, timestamp, None, 0,0))
-                db.commit()
-                print("success")
-            except pymysql.Error as e:
-                print("Error %d: %s" % (e.args[0], e.args[1]))
- 
     return "ok"
+
+@app.route('/borrowing')
+def borrowing():
+    return render_template('borrowing.html')
 
 #----- other function -----
 def GenerateCode(l,n):
