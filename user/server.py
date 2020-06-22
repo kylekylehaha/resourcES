@@ -144,7 +144,7 @@ def borrowing(Name):
         data_Ename = cursor.fetchall()
         borrow_list[i][0] = data_Ename[0][0]
     
-    return render_template('borrowing.html', borrow_list = borrow_list)
+    return render_template('borrowing.html', borrow_list = borrow_list, Name=Name)
 
 #----- other function -----
 def GenerateCode(l,n):
