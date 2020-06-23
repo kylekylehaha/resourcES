@@ -254,7 +254,7 @@ def UpdateStatus():
 		cursor.execute('UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s',order_num)
 		db.commit()
 
-	#-----Order_status = 5-----
+	#-----Order_status = 3 or 5-----
 	if operation == 'done':
 		cursor.execute('UPDATE BORROW SET Order_status = 6 WHERE Order_num = %s',order_num)
 		db.commit()
