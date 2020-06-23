@@ -305,7 +305,7 @@ def RenewResource():
 
     Renew_flag = 0
     Order_num = request.values.get('Order_num')
-    cursor.execute('SELECT B.Enum FROM BORROW AS B, RESOURCES AS R WHERE B.Order_status = 3 AND B.Due_date > timestamp AND B.Order_num = %s AND B.Renewal_times < B.Renewal_limit AND B.Enum = R.Enum',Order_num)
+    cursor.execute('SELECT B.Enum FROM BORROW AS B, RESOURCES AS R WHERE B.Order_status = 3 AND B.Due_date > timestamp AND B.Order_num = %s AND B.Renewal_times < R.Renewal_limit AND B.Enum = R.Enum',Order_num)
     db.commit()
     #data[0] = Enum
     data = cursor.fetchone()
