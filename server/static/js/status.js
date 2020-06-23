@@ -25,7 +25,7 @@ $("button").click((evt)=>{
 		error: function(xhr) {
 			alert('Ajax request 發生錯誤');
 		},
-		success: function(response) {
+		success: function(response){
             console.log("good");
             location.reload();
         }
