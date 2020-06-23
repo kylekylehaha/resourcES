@@ -222,13 +222,17 @@ def UpdateStatus():
 			cursor.execute('UPDATE BORROW SET Renewal_times = Renewal_times + 1 WHERE Order_num = %s',order_num)
 			db.commit()
 		
-			cursor.execute('SELECT R.Loan_period FROM RESOURCES AS R,BORROW AS B 
-							WHERE R.Enum = B.Enum AND B.Order_num = %s',order_num)
+			cursor.execute('SELECT R.Loan_period FROM RESOURCES AS R,BORROW AS B WHERE R.Enum = B.Enum AND B.Order_num = %s',order_num)
+			db.commit()
 			data = int(cursor.fetchone()[0])
 			delta_time = datetime.timedelta(days = data)
-			delta_time = (delta_time).strftime('%Y-%m%d %H:%M:%S')
-			cursoe.execute('UPDATE BORROW SET Due_date = Due_date + delta_time
-							WHERE Order_num= %s',order_num)
+
+			cursor.execute('SELECT Due_date FROM BORROW WHERE Order_num = %s', order_num)
+			db.commit()
+			due_date = cursor.fetchone()[0]
+			due_date = (delta_time + due_date).strftime('%Y-%m%d %H:%M:%S')
+			
+			cursor.execute('UPDATE BORROW SET Due_date = %s WHERE Order_num= %s', (due_date, order_num))
 			db.commit()
 		if operation == 'reject':
 			cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',order_num)
@@ -250,7 +254,7 @@ def UpdateStatus():
         except pymysql.Error as e:
             print("Error %d: %s" % (e.args[0], e.args[1]))
     #-----Order_status = 3-----
-	if operation == 'applyrenewsources':
+	if operation == 'apply_renew_resources':
 		cursor.execute('UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s',order_num)
 		db.commit()
 
