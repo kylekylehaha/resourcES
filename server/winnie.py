@@ -27,14 +27,11 @@ def Mall(Name):
     data = cursor.fetchall()
     print(data)
 
-    
-
-
     item_list = {}
     photo_list = {}
     
     for i in data:
-        if i[0] == 1:
+       if i[0] == 1:
             item_list[i[6]] = [i[1],i[2],i[3],i[4],i[5],i[6],'需預約',i[8],i[9]]
             photo_list[i[6]] = i[7]
   
@@ -122,27 +119,24 @@ def Add():
             data = cursor.fetchone()
             print(data)
            
-            '''
             if data is None:
                 print("make a reservation")
+                
+                cursor.execute('SELECT MAX(Rank) FROM BORROW WHERE Enum = %s',(enum))
+                data = int(cursor.fetchone()[0])
 
+                try:
+                    order_num = GenerateCode(4,1)
+                    cursor.execute('INSERT INTO BORROW VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn , enum, None, None, 0, 0, data+1))
+                    db.commit()
+                    print("commit finish")
+                except pymysql.Error as e:
+                    print("Error %d: %s" % (e.args[0], e.args[1]))
+                    if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
+                        return("duplicated")
             else:
-                print("cannot make a reservation")
-            '''
-            '''
-            cursor.execute('SELECT MAX(Rank) FROM BORROW WHERE Enum = %s',(enum))
-            data = int(cursor.fetchone()[0])
+                return "cannotreserved"
 
-            try:
-                order_num = GenerateCode(4,1)
-                cursor.execute('INSERT INTO BORROW VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn , enum, None, None, 0, 0, data+1))
-                db.commit()
-                print("commit finish")
-            except pymysql.Error as e:
-                print("Error %d: %s" % (e.args[0], e.args[1]))
-                if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
-                    return("duplicated")
-            '''
         if addtype == 'Borrow':
             print("borrow")
             order_num = GenerateCode(4,1)
@@ -168,7 +162,7 @@ def Status(Name):
 
     if infotype == 'lend':
         print("lend")
-        cursor.execute('SELECT Flag, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, MAX(Order_status), MAX(Rank) FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s AND Order_status <> 6 GROUP BY R.Enum',ssn)
+        cursor.execute('SELECT Order_num, Flag, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, MAX(Order_status), MAX(Rank) FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s AND Order_status <> 0 AND Order_status <> 6 GROUP BY R.Enum',ssn)
         data = cursor.fetchall()
         print(data)
 
@@ -177,23 +171,23 @@ def Status(Name):
         item_list = {}
         photo_list = {}
         for i in data:
-            if i[0] == 1:
+            if i[1] == 1:
                 flag = "yes"
             else:
                 flag = "no"
             
-            if i[7] == 1:
+            if i[8] == 1:
                 status = '待審核'
-            if i[7] == 2:
+            if i[8] == 2:
                 status = '待領取'
-            if i[7] == 3:
+            if i[8] == 3:
                 status = '已領取'
-            if i[7] == 5:
+            if i[8] == 5:
                 status = '拒租用'
 
             print(status)
-            item_list[i[5]] = [flag,i[1],i[2],i[3],i[4],i[5],i[8],status]
-            photo_list[i[5]] = i[6]
+            item_list[i[6]] = [i[0],flag,i[2],i[3],i[4],i[5],i[6],i[9],status]
+            photo_list[i[6]] = i[7]
 
         return render_template("status.html",item_list = item_list, photo_list = photo_list)
  
@@ -206,20 +200,20 @@ def Status(Name):
 @app.route('/update_status',methods=['GET'])
 def UpdateStatus():
     name = request.values.get('name')
-    enum = request.values.get('enum')
+    order_num = request.values.get('order_num')
     operation = request.values.get('operation')
 
     #-----Order_status = 1-----
     if operation == 'accept':
-        cursor.execute('UPDATE BORROW SET Order_status = 2 WHERE Enum = %s AND Order_status = 1',enum)
+        cursor.execute('UPDATE BORROW SET Order_status = 2 WHERE Order_num = %s',order_num)
         db.commit()
     if operation == 'reject':
-        cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Enum = %s AND Order_status = 1',enum)
+        cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',order_num)
         db.commit()
 
     #-----Order_status = 2-----
     if operation == 'out':
-        cursor.execute('SELECT Loan_period FROM RESOURCES WHERE Enum=%s',enum)
+        cursor.execute('SELECT Loan_period FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_num=%s',order_num)
         data = int(cursor.fetchone()[0])
         delta = datetime.timedelta(days=data)
     
@@ -228,7 +222,7 @@ def UpdateStatus():
         print(due_date)
 
         try:
-            cursor.execute('UPDATE BORROW SET Order_status=3,Date_out=%s,Due_date=%s WHERE Enum=%s AND Order_status=2',(timestamp,due_date,enum))
+            cursor.execute('UPDATE BORROW SET Order_status=3,Date_out=%s,Due_date=%s WHERE Order_num=%s',(timestamp,due_date,order_num))
             db.commit()
         except pymysql.Error as e:
             print("Error %d: %s" % (e.args[0], e.args[1]))

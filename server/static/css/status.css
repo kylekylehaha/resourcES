@@ -1,0 +1,15 @@
+table{
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
+#nav_bar_title{
+    font-family: comic sans ms;
+    font-weight: bold;
+    color: #FFFFFF;
+	font-size: 30px;
+}
+
+#nav_bar{
+    margin-bottom: 20px;
+}

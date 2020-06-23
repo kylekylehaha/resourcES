@@ -147,8 +147,9 @@ def AddResources():
     Loan_period = request.values.get('Loan_period')
     Renewal_limit= request.values.get('Renewal_limit')
     Flag = request.values.get('Flag')
+    Enum = GenerateCode(3,2)
     try:
-        cursor.execute('INSERT INTO RESOURCES VALUES(%s, %s, %s, %s, %s, %s, %s)',(Flag,Renewal_limit,Ssn,Ename,Notice,Ephoto,Loan_perioad,Enum))
+        cursor.execute('INSERT INTO RESOURCES VALUES(%s, %s, %s, %s, %s, %s, %s, %s)',(Flag, Renewal_limit, Ssn, Ename, Notice, Ephoto, Loan_perioad, Enum))
         db.commit()
     except pymysql.Error as e:
         print('Error %d: %s' % (e.args[0], e.args[1]))
@@ -165,26 +166,51 @@ def FlagToZeroOrOne():
 
 
 #-----update order_status-------
-@app.route('/updatestatus',methods = ['GET'])
+@app.route('/update_status',methods = ['GET'])
 def UpdateStatus():
+    Order_num = request.values.get('Order_num')
+    operation = request.values.get('operation')
+    if operation == 'applyrenewsources':
+        cursor.execute('UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s',Order_num)
+        db.commit()     
+    if operation == 'accept':
+        cursor.execute('UPDATE BORROW SET Order_status = 3 WHERE Order_num = %s',Order_num)
+        cursor.execute('UPDATE BORROW SET Renewal_times = Renewal_times + 1 WHERE Order_num = %s',Order_num)
+        db.commit()
+        
+        cursor.execute('SELECT R.Loan_period FROM RESOURCES AS R,BORROW AS B 
+                        WHERE R.Enum = B.Enum AND B.Order_num = %s',Order_num)
+        data = int(cursor.fetchone()[0])
+        delta_time = datetime.timedelta(days = data)
+        delta_time = (delta_time).strftime('%Y-%m%d %H:%M:%S')
+        cursoe.execute('UPDATE BORROW SET Due_date = Due_date + delta_time
+                        WHERE Order_num= %s',Order_num)
+        db.commit()
+    if operation == 'reject':
+        cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',Order_num)
+        db.commit()
+    if operation == 'done':
+        cursor.execute('UPDATE BORROW SET Order_status = 6 WHERE Order_num = %s',Order_num)
+        db.commit()
 
-    if Apply
-    return 'ok':
+    return 'ok'
+
+
+
+
+
+
 
 #-----condition of renew resource-------
 @app.route('/renewresource',methods = ['GET'])
 def RenewResource():
     '''
-    1.當A訂單的Order_status = 3(已領取), 且不存在其他 與A訂單同一個Enum的訂單 的Order_status = 0,
-      且已續借次數<器材可續借次數, 且Now()<Due_date)
-    2.A訂單使用者即有選擇續借的權利, renew_flag = 1
-    #3.A訂單使用者提出申請 ,UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s ;
-    #4.等待出借者按下確認鍵, AGREE: UPDATE BORROW SET Order_status = 3 WHERE Order_num = %s , Renewal_times += 1 , Due_date += Loan_period
-                         DISAGREE: UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s
-                         
+    1. 當A訂單的Order_status = 3(已領取), 且不存在其他 與A訂單同一個Enum的訂單 的Order_status = 0,
+       且已續借次數<器材可續借次數, 且Now()<Due_date)
+    2. A訂單使用者即有選擇續借的權利, renew_flag = 1
     '''
 
-    renew_flag = 0
+    Renew_flag = 0
     Order_num = request.values.get('Order_num')
     cursor.execute('SELECT B.Enum 
                     FROM BORROW AS B, RESOURCES AS R 
@@ -195,9 +221,9 @@ def RenewResource():
     cursor.execute('SELECT DISTINCT Order_status FROM BORROW WHERE Enum = %s AND Order_status = 0',data[0])
     statuses = cursor.fetchone()
     if status == None:
-        renew_flag = 1
+        Renew_flag = 1
     
-    render_template(renew_flag = renew_flag)
+    render_template(Renew_flag = Renew_flag)
         
     return 'ok'
 
@@ -210,13 +236,13 @@ def ReturnEquip():
     #2. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
     #3. Update Order_status = 1 where Rank = 1 of this equipment
     #4. Update Rank = Rank - 1 where status != 6 of this equipmen
-    
+    '''
 
     #-----required data from url-----
     Order_num = request.values.get('Order_num')
     
     #-----step1-----
-    cursor.execute('UPDATE BORROW SET Order_status = %s WHERE Order_num=%s',(5,Order_num))
+    #cursor.execute('UPDATE BORROW SET Order_status = %s WHERE Order_num=%s',(6,Order_num))
     
     #-----step2-----
     date_format = "%Y-%m-%d %T"    
