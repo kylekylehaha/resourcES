@@ -135,6 +135,7 @@ def Add():
                     if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
                         return("duplicated")
             else:
+                print("cannotreserved")
                 return "cannotreserved"
 
         if addtype == 'Borrow':

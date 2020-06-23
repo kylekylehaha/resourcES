@@ -138,6 +138,7 @@ $("#confirm-button").click(()=>{
 			alert('Ajax request 發生錯誤');
 		},
 		success: function(response) {
+            console.log(response);
             if(response == "cannotreserved"){
 	    	    $.alert({
                     theme: 'modern',
