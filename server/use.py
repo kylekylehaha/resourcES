@@ -392,7 +392,7 @@ def ReturnEquip():
      Another version: w/o RESERVATION ; add attribute(Rank) into BORROW
     1. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
     2. Update Order_status = 1 where Rank = 1 of this equipment
-    3. Update Rank = Rank - 1 where status != 6 of this equipmen
+    3. Update Rank = Rank - 1 where status != 6 of this equipment
     '''
     #-----required data from url-----
     Order_num = request.values.get('Order_num')
