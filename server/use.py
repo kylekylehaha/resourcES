@@ -292,22 +292,20 @@ def FlagToZeroOrOne():
     Flag = request.values.get('Flag')
     Enum = request.values.get('Enum')
     cursor.execute('UPDATE RESOURCES SET Flag = %s WHERE Enum = %s',(Flag, Enum))
-
+	db.commit()
 
 #-----condition of renew resource-------
 @app.route('/renewresource',methods = ['GET'])
 def RenewResource():
     '''
     1. 當A訂單的Order_status = 3(已領取), 且不存在其他 與A訂單同一個Enum的訂單 的Order_status = 0,
-       且已續借次數<器材可續借次數, 且Now()<Due_date)
+       且已續借次數<器材可續借次數, 且Now() < Due_date)
     2. A訂單使用者即有選擇續借的權利, renew_flag = 1
     '''
 
     Renew_flag = 0
     Order_num = request.values.get('Order_num')
-    cursor.execute('SELECT B.Enum 
-                    FROM BORROW AS B, RESOURCES AS R 
-                    WHERE B.Order_status = 3 AND B.Due_date > timestamp AND B.Order_num = %s AND B.Renewal_times < B.Renewal_limits AND B.Enum = R.Enum',Order_num)
+    cursor.execute('SELECT B.Enum FROM BORROW AS B, RESOURCES AS R WHERE B.Order_status = 3 AND B.Due_date > timestamp AND B.Order_num = %s AND B.Renewal_times < B.Renewal_limits AND B.Enum = R.Enum',Order_num)
     db.commit()
     #data[0] = Enum
     data = cursor.fetchone()
