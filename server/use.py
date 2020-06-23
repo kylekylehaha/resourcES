@@ -205,18 +205,44 @@ def UpdateStatus():
     order_num = request.values.get('order_num')
     operation = request.values.get('operation')
 
-    #-----Order_status = 1-----
-    if operation == 'accept':
-        cursor.execute('UPDATE BORROW SET Order_status = 2 WHERE Order_num = %s',order_num)
-        db.commit()
-    if operation == 'reject':
-        cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',order_num)
-        db.commit()
+    #-----Order_status = 1 or 4-----
+    cursor.execute('SELECT Order_status FROM BORROW WHERE Order_num=%s',order_num)
+	order_status = cursor.fetchone()[0]
+	if order_status == 1:
+		if operation == 'accept':
+			cursor.execute('UPDATE BORROW SET Order_status = 2 WHERE Order_num = %s',order_num)
+			db.commit()
+		if operation == 'reject':
+			cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',order_num)
+			db.commit()
+    
+	if order_status == 4:
+		if operation == 'accept':
+			cursor.execute('UPDATE BORROW SET Order_status = 3 WHERE Order_num = %s',order_num)
+			db.commit()
+			cursor.execute('UPDATE BORROW SET Renewal_times = Renewal_times + 1 WHERE Order_num = %s',order_num)
+			db.commit()
+		
+			cursor.execute('SELECT R.Loan_period FROM RESOURCES AS R,BORROW AS B WHERE R.Enum = B.Enum AND B.Order_num = %s',order_num)
+			db.commit()
+			data = int(cursor.fetchone()[0])
+			delta_time = datetime.timedelta(days = data)
 
+			cursor.execute('SELECT Due_date FROM BORROW WHERE Order_num = %s', order_num)
+			db.commit()
+			due_date = cursor.fetchone()[0]
+			due_date = (delta_time + due_date).strftime('%Y-%m%d %H:%M:%S')
+			
+			cursor.execute('UPDATE BORROW SET Due_date = %s WHERE Order_num= %s', (due_date, order_num))
+			db.commit()
+		if operation == 'reject':
+			cursor.execute('UPDATE BORROW SET Order_status = 5 WHERE Order_num = %s',order_num)
+			db.commit()
     #-----Order_status = 2-----
     if operation == 'out':
         cursor.execute('SELECT Loan_period FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_num=%s',order_num)
-        data = int(cursor.fetchone()[0])
+        db.commit()
+		data = int(cursor.fetchone()[0])
         delta = datetime.timedelta(days=data)
     
         current_time = raw_timestamp
@@ -228,89 +254,71 @@ def UpdateStatus():
             db.commit()
         except pymysql.Error as e:
             print("Error %d: %s" % (e.args[0], e.args[1]))
+    #-----Order_status = 3-----
+	if operation == 'apply_renew_resources':
+		cursor.execute('UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s',order_num)
+		db.commit()
 
-    #-----Order status = 5-----
-    #if operation == 'return':
-        
+	#-----Order_status = 3 or 5-----
+	if operation == 'done':
+		cursor.execute('UPDATE BORROW SET Order_status = 6 WHERE Order_num = %s',order_num)
+		db.commit()
+		ReturnEquip()
+	
+	return "ok"
 
-    return "ok"
 
-#-------yuyun-------
-@app.route('/violation',methods=['GET'])
-def Violation():
-    cursor.execute('SELECT Ssn FROM USER WHERE Violation>=2')
-    Ssns=cursor.fetchall()
-    for Ssn in Ssns:
-        cursor.execute('SELECT Borrowing_time FROM USER WHERE Ssn=%s',Ssn[0])
+#-----add resources-----
+@app.route('/addresources',methods=['GET'])
+def AddResources():
+    Ephoto = request.values.get('Ephoto')
+    Ename = request.values.get('Ename')
+    Ssn = request.values.get('Ssn')
+    Notice = request.values.get('Notice') 
+    Loan_period = request.values.get('Loan_period')
+    Renewal_limit= request.values.get('Renewal_limit')
+    Flag = request.values.get('Flag')
+    Enum = GenerateCode(3,2)
+    try:
+        cursor.execute('INSERT INTO RESOURCES VALUES(%s, %s, %s, %s, %s, %s, %s, %s)',(Flag, Renewal_limit, Ssn, Ename, Notice, Ephoto, Loan_perioad, Enum))
         db.commit()
-        Borrowing_time = cursor.fetchone()
-        print(Borrowing_time[0])
-        if Borrowing_time[0] is None:
-            cursor.execute('UPDATE USER SET Borrowing_time = %s + interval 1 month WHERE Ssn=%s',(timestamp,Ssn[0]))
-            db.commit()
-        else:
-            cursor.execute('UPDATE USER SET Borrowing_time = Borrowing_time + interval 1 month WHERE Ssn=%s',(Ssn[0]))
-            db.commit()
+    except pymysql.Error as e:
+        print('Error %d: %s' % (e.args[0], e.args[1]))
+
+    return("ok")
+
+#-----make resources (not) in use-----
+@app.route('/flagto0or1',methods = ['GET'])
+def FlagToZeroOrOne():
+    Flag = request.values.get('Flag')
+    Enum = request.values.get('Enum')
+    cursor.execute('UPDATE RESOURCES SET Flag = %s WHERE Enum = %s',(Flag, Enum))
+	db.commit()
+
+#-----condition of renew resource-------
+@app.route('/renewresource',methods = ['GET'])
+def RenewResource():
+    '''
+    1. 當A訂單的Order_status = 3(已領取), 且不存在其他 與A訂單同一個Enum的訂單 的Order_status = 0,
+       且已續借次數<器材可續借次數, 且Now() < Due_date)
+    2. A訂單使用者即有選擇續借的權利, renew_flag = 1
+    '''
+
+    Renew_flag = 0
+    Order_num = request.values.get('Order_num')
+    cursor.execute('SELECT B.Enum FROM BORROW AS B, RESOURCES AS R WHERE B.Order_status = 3 AND B.Due_date > timestamp AND B.Order_num = %s AND B.Renewal_times < R.Renewal_limit AND B.Enum = R.Enum',Order_num)
+    db.commit()
+    #data[0] = Enum
+    data = cursor.fetchone()
+    cursor.execute('SELECT DISTINCT Order_status FROM BORROW WHERE Enum = %s AND Order_status = 0',data[0])
+    statuses = cursor.fetchone()
+    if status == None:
+        Renew_flag = 1
+    
+    render_template(Renew_flag = Renew_flag)
+        
     return 'ok'
 
-#-----return equipment-----
-@app.route('/returnequip',methods=['GET'])
-def ReturnEquip():
-    '''
-    1. Update BORROW Order_status 
-    1-2.If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
-    2. Check if there is any reservation of this equipment
-    3. Get the information of rank = 1 of this equipment from RESERVATION
-    4. DELETE Rank = 1
-    (e.g. DELETE FROM RESERVATION WHERE Enum='ael23' AND Rank = 1)
-    5. Update Rank
-    (e.g. UPDATE RESERVATION SET Rank=Rank-1 WHERE Enum='ael23')
-    '''
-    '''
-    Another version: w/o RESERVATION ; add attribute(Rank) into BORROW
-    1. Update BORROW Order_status 
-    2. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
-    3. Update Rank = 1 to Rank = 0 of this equipment from BORROW
-    4. Check if there is any reservation (Rank != 0)of this equipment
-    5. Update Rank
-    6. Update Order_status = 1 where Rank=1 
-    '''
-    '''
-    1. Update BORROW Order_status to 6   
-    2. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
-    3. Update Rank = Rank - 1 where status != 6 of this equipment
-    4. Update Order_status = 1 where Rank = 0 and Order_status != 6
- 
-    '''
-    #QQ假定傳回來的是Order_num
-
-    #-----required data from url-----
-#   Order_num = request.values.get('Order_num')
-    Order_num = 'aaaa0'
-    #-----step1-----
-    cursor.execute('UPDATE BORROW SET Order_status = %s WHERE Order_num=%s',(5,Order_num))
-    #-----step2-----
-    date_format = "%Y-%m-%d %T"    
-    cursor.execute('SELECT DATE_FORMAT(Due_date,%s),Ssn,Enum FROM BORROW WHERE Order_num = %s',(date_format,Order_num))
-    #data[0] = Due_date ; date[1] = Ssn ; data[2] = Enum 
-    data = cursor.fetchone()
-    if timestamp >= data[0]:
-        cursor.execute('UPDATE USER SET Violation = Violation + 1 WHERE Ssn = %s',(data[1]))
-        cursor.execute('SELECT Violation FROM USER WHERE Ssn=%s',data[1])
-        Violation = cursor.fetchone()
-        if Violation[0] >= 2:
-            Punishment(data[1])
-    #-----step3-----
-    cursor.execute('UPDATE BORROW SET Rank = %s WHERE Order_num = %s',(0,Order_num))
-    db.commit()
-    #-----step4&5-----
-    print(data[2])
-    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Rank <> 0',data[2])
-    db.commit()
-    #-----step6------
-    cursor.execute('UPDATE BORROW SET Order_status = 1 WHERE Enum = %s AND Rank = 1',(data[2:]))
-
-    return "ok"
 
 @app.route('/test',methods=['GET'])
 def test():
@@ -377,7 +385,39 @@ def GenerateCode(l,n):
         ret += number
     return ret
 
+#-----return equipment-----
+def ReturnEquip():
+    '''
+     Another version: w/o RESERVATION ; add attribute(Rank) into BORROW
+    1. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
+    2. Update Order_status = 1 where Rank = 1 of this equipment
+    3. Update Rank = Rank - 1 where status != 6 of this equipment
+    '''
+    #-----required data from url-----
+    Order_num = request.values.get('Order_num')
+    
+    #-----step1-----
+    date_format = "%Y-%m-%d %T"    
+    cursor.execute('SELECT DATE_FORMAT(Due_date,%s),Ssn,Enum FROM BORROW WHERE Order_num = %s',(date_format,Order_num))
+    #data[0] = Due_date ; date[1] = Ssn ; data[2] = Enum 
+    data = cursor.fetchone()
+    if timestamp >= data[0]:
+        cursor.execute('UPDATE USER SET Violation = Violation + 1 WHERE Ssn = %s',(data[1]))
+        cursor.execute('SELECT Violation FROM USER WHERE Ssn=%s',data[1])
+        Violation = cursor.fetchone()
+        if Violation[0] >= 2:
+            Punishment(data[1])
+    
+    #-----step2-----
+    cursor.execute('UPDATE BORROW SET Order_status = 1 WHERE Enum = %s AND Rank = 1',(data[2]))
+    db.commit()
+    
+    #-----step3-----
+    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Rank <> 6',data[2])
+    db.commit()
 
+    return "ok"
+	
 def Punishment(Ssn):
     cursor.execute('SELECT borrowing_time FROM USER WHERE Ssn=%s',Ssn)
     db.commit()
