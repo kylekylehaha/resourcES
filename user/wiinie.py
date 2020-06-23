@@ -1,120 +1,56 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask , render_template , request
 import pymysql
-import os
+import json
 import random
 import time
 import datetime
 
 ts = time.time()
-timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-app = Flask(__name__)
-app.secret_key = os.urandom(24)
+raw_timestamp = datetime.datetime.fromtimestamp(ts)
+timestamp = raw_timestamp.strftime('%Y-%m-%d %H:%M:%S')
 date_format = "%Y-%m-%d %T"
 
-@app.route('/', methods=['GET', 'POST'])
-def home():
-    return render_template('index.html')
+app = Flask(__name__)
 
-@app.route('/sign_up.html', methods=['GET', 'POST'])
-#-----Sign up function-----
-def sign_up():
-    sql_select_query = "SELECT Dnum, Dname FROM DEPARTMENT;"
-    cursor.execute(sql_select_query)
-    data = cursor.fetchall()
-    Dept_list= {}
-    for i in data:
-        Dept_list[i[0]]=i[1]
-    
-    if request.method == 'POST':
-        I_Name = request.values.get('Name')
-        I_Email = request.values.get('Email')
-        I_Ssn = request.values.get('Ssn')
-        I_Password = request.values.get('Password')
-        I_Department = request.values.get('Department')
-        for i in data:
-            if I_Department == i[1]:
-                I_Department = i[0]
-                break
+PYMYSQL_DUPLICATE_ERROR = 1062
 
-        insert_tuple = (I_Name, I_Email, I_Ssn, I_Password, I_Department, None, 0)
-        sql_insert_query = "INSERT into USER VALUES (%s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sql_insert_query, insert_tuple) 
-        db.commit()
-        
-        return render_template('member.html', Name=I_Name) 
-    
-    return render_template('sign_up.html')
-
-@app.route('/sign_in.html', methods=['GET', 'POST'])
-#-----Sign in function-----
-def sign_in():
-    if request.method == 'POST':
-        test_Ssn = request.values.get('Ssn')
-        test_Password = request.values.get('Password')
-        sql_select_query = "SELECT Password, Name FROM USER WHERE Ssn = %s;"
-        cursor.execute(sql_select_query, test_Ssn)
-        data = cursor.fetchall()
-        S_data = data[0][0]
-        S_Name = data[0][1]
-        if data is not None:
-            if test_Password == S_data :
-                return redirect(url_for('member', Name=S_Name))
-            else:
-                return render_template('sign_in.html')
-        else:
-            return render_template('sign_up.html')
-
-    return render_template('sign_in.html')
-
-@app.route('/member/<Name>')
-#----- member interface -----
-def member(Name):
-    return render_template('member.html', Name = Name)
-
-@app.route('/member_info/<Name>')
-#----- member information -----
-def member_info(Name):
-    #----- select Name information -----
-    
-    sql_select_query = "SELECT Name, Ssn, Department, Email, Violation FROM USER WHERE Name = %s;"
-    cursor.execute(sql_select_query, Name)
-    data = cursor.fetchall()
-    S_Name = data[0][0] 
-    S_Ssn = data[0][1]
-    S_Dept = data[0][2]
-    S_Email = data[0][3]
-    S_Violation = data[0][4]
-    sql_selectname_query = "SELECT Dname FROM DEPARTMENT WHERE Dnum = %s"
-    cursor.execute(sql_selectname_query, S_Dept)
-    data_dept = cursor.fetchall()
-    S_Dname = data_dept[0][0]
-    return render_template('member_info.html', Name=S_Name, Ssn=S_Ssn, Dept=S_Dname, Email=S_Email, Violation=S_Violation )
-    
-@app.route('/mall/<Name>', methods=['GET'])
-def mall(Name):
+@app.route('/mall/<Name>',methods=['GET'])
+def Mall(Name):
     #------Reservation-----
+    #print("-----Reservation-----")
+
+    cursor = db.cursor()
     cursor.execute('SELECT Flag, Ename, R.Ssn, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Max(Rank), DATE_FORMAT(Due_date,%s) FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_status <> 6 GROUP BY R.Enum',date_format) 
-    
+
     data = cursor.fetchall()
+    #print(data)
+
     item_list = {}
     photo_list = {}
-    
+
     for i in data:
         if i[0] == 1:
             item_list[i[6]] = [i[1],i[2],i[3],i[4],i[5],i[6],'需預約',i[8],i[9]]
             photo_list[i[6]] = i[7]
-  
+
     #-----Borrow-----
+    #print("-----Borrow-----")
+    cursor = db.cursor()
     cursor.execute('SELECT Flag, Ename, Ssn, Renewal_limit, Loan_period, Notice, Enum, Ephoto FROM RESOURCES EXCEPT(SELECT Flag, Ename, R.Ssn, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_status <> 6)')
     data = cursor.fetchall()
+    cursor.close()
+    #print(data)
 
     for i in data:
         if i[0] == 1:
             item_list[i[6]] = [i[1],i[2],i[3],i[4],i[5],i[6],'可借用']
             photo_list[i[6]] = i[7]
 
-    return render_template("mall.html",item_list = item_list, photo_list = photo_list, Name=Name)
-    
+    #print(item_list)
+    #print(photo_list)
+
+    return render_template("index.html",item_list = item_list, photo_list = photo_list)
+
 #-----keyword searching-----
 @app.route('/keyword/<Name>',methods=['GET'])
 def KeyWord(Name):
@@ -129,27 +65,34 @@ def KeyWord(Name):
 
     #-----MYSQL command line-----
     #------Reservation-----
+    #print("-----Reservation-----")
     cursor.execute('SELECT Flag, Ename, R.Ssn, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Max(Rank), DATE_FORMAT(Due_date,%s) FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_status <> 6 AND Ename LIKE %s GROUP BY R.Enum',(date_format,keyword))
     data = cursor.fetchall()
+    #print(data)
 
     item_list = {}
     photo_list = {}
-    
+
     for i in data:
         if i[0] == 1:
             item_list[i[6]] = [i[1],i[2],i[3],i[4],i[5],i[6],'需預約',i[8],i[9]]
             photo_list[i[6]] = i[7]
 
     #-----Borrow-----
+    #print("-----Borrow-----")
     cursor.execute('SELECT Flag, Ename, Ssn, Renewal_limit, Loan_period, Notice, Enum, Ephoto FROM RESOURCES WHERE Ename LIKE %s EXCEPT(SELECT Flag, Ename, R.Ssn, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE Order_status <> 6 AND Ename LIKE %s)',(keyword,keyword))
     data = cursor.fetchall()
-    
+    #print(data)
+
     for i in data:
         if i[0] == 1:
             item_list[i[6]] = [i[1],i[2],i[3],i[4],i[5],i[6],'可借用']
             photo_list[i[6]] = i[7]
 
-    return render_template("mall.html",item_list = item_list, photo_list = photo_list)
+    #print(item_list)
+    #print(photo_list)
+
+    return render_template("index.html",item_list = item_list, photo_list = photo_list)
 
 @app.route('/add',methods=['GET'])
 def Add():
@@ -158,17 +101,20 @@ def Add():
     value = request.values.get('value') # yes or no
     name = request.values.get('name') #student id
     enum = request.values.get('enum') #equipment number
-    
+
     ssn = Name2Ssn(name)
 
     if value == "yes":
         if addtype == 'Reservation':
+            #print("reservation")
 
             cursor.execute('SELECT Order_status FROM BORROW WHERE Enum=%s AND Ssn=%s AND Order_status <> 6',(enum,ssn))
             data = cursor.fetchone()
-           
+            #print(data)
+
             if data is None:
-                
+                #print("make a reservation")
+
                 cursor.execute('SELECT MAX(Rank) FROM BORROW WHERE Enum = %s',(enum))
                 data = int(cursor.fetchone()[0])
 
@@ -176,145 +122,32 @@ def Add():
                     order_num = GenerateCode(4,1)
                     cursor.execute('INSERT INTO BORROW VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn , enum, None, None, 0, 0, data+1))
                     db.commit()
+                    #print("commit finish")
                 except pymysql.Error as e:
                     print("Error %d: %s" % (e.args[0], e.args[1]))
                     if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
                         return("duplicated")
             else:
-                print("cannotreserved")
+                #print("cannotreserved")
                 return "cannotreserved"
 
         if addtype == 'Borrow':
-            print("borrow")
+            #print("borrow")
+            cursor.execute('SELECT Ssn FROM RESOURCES WHERE Enum=%s',enum)
+            data = str(cursor.fetchone()[0])
+            
+            if data == ssn:
+                return "yourself"
+
             order_num = GenerateCode(4,1)
             try:
                 cursor.execute('INSERT INTO BORROW VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn, enum, timestamp, None, 1, 0,0))
                 db.commit()
+                #print("success")
             except pymysql.Error as e:
                 print("Error %d: %s" % (e.args[0], e.args[1]))
- 
+
     return "ok"
-
-
-@app.route('/borrowing/<Name>')
-def borrowing(Name):
-    sql_select_Ssn_query = "SELECT Ssn FROM USER WHERE Name = %s;"
-    cursor.execute(sql_select_Ssn_query, Name)
-    data = cursor.fetchall()
-    Ssn = data[0][0]
-    sql_select_borrow_query = "SELECT Enum, Rank, Date_out, Due_Date, Renewal_times, Order_status, Order_num FROM BORROW WHERE Ssn = %s;"
-    cursor.execute(sql_select_borrow_query, Ssn)
-    data_borrow = cursor.fetchall()
-
-    #----- borrow_list(Enum, Rank, Date_out, Due_Date, Renewal_times, Order_status, Order_num, Ephoto, Renewal_flag) -----
-    borrow_list = [[None for x in range(9)]for y in range(len(data_borrow))]
-    
-    for i in range(len(data_borrow)):
-        for j in range(len(data_borrow[i])):
-            borrow_list[i][j] = data_borrow[i][j]
-    
-    status_name = ['預約中', '待審核', '待領取', '已領', '續租審核', '拒租用', '已歸還']
-
-    # ----- select Ename & Ephoto-----
-    for i in range(len(borrow_list)):
-        sql_select_Ename_query = "SELECT Ename, Ephoto FROM RESOURCES WHERE Enum = %s;"
-        cursor.execute(sql_select_Ename_query, borrow_list[i][0])
-        data_Ename_Ephoto = cursor.fetchall()
-        borrow_list[i][0] = data_Ename_Ephoto[0][0]
-        borrow_list[i][7] = data_Ename_Ephoto[0][1]
-        #----- select Order_status name -----
-        borrow_list[i][5] = status_name[borrow_list[i][5]]
-        # ----- check whether Renewal_flag == 1 -----
-        if RenewResource(borrow_list[i][6]) == 1:
-            borrow_list[i][8] = 1
-        else:
-            borrow_list[i][8] = 0
-
-
-    # ----- renewal flag request -----
-    if request.method == 'POST':
-        change_flag_index = request.values.get('Renewal_flag')
-        sql_update_query = "UPDATE BORROW SET Order_status = 4 WHERE Order_num = %s;"
-        cursor.execute(sql_update_query, borrow_list[change_flag_index][6])
-        db.commit()
-        return url_for('borrowing', Name=Name)
-
-
-    return render_template('borrowing.html', borrow_list = borrow_list, Name=Name)
-
-@app.route('/lend/<Name>', methods=['GET', 'POST'])
-def lend(Name):
-    #----- select Ssn -----
-    sql_select_Ssn_query = "SELECT Ssn FROM USER WHERE Name = %s;"
-    cursor.execute(sql_select_Ssn_query, Name)
-    data_Ssn = cursor.fetchall()
-    Ssn = data_Ssn[0][0]
-
-    #----- receive new resources to insert into DB------
-    if request.method == 'POST':
-        I_Ename = request.values.get('Ename')
-        I_Ephoto = request.values.get('Ephoto')
-        if I_Ephoto == '':
-            print ("fuck")
-            I_Ephoto = "https://financemj.com/wp-content/uploads/2016/05/nophoto.png"
-
-        I_Renewal_limit = request.values.get('Renewal_limit')
-        I_Loan_period = request.values.get('Loan_period')
-        Y_outside = request.values.get('Y_outside')
-        N_outside = request.values.get('N_outside')
-        I_Notice = request.values.get('Notice')
-        if Y_outside == 'on':
-            I_Flag = 1
-        else:
-            I_Flag = 0
-
-        I_Enum = GenerateCode(3, 2)
-        #----- insert new resources -----
-        sql_insert_query = "INSERT into RESOURCES VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-        val = (I_Flag, I_Renewal_limit, Ssn, I_Ename, I_Notice, I_Ephoto, I_Loan_period, I_Enum)
-        cursor.execute(sql_insert_query,val) 
-        db.commit()
-
-        #----- select lended equipment ------
-        sql_select_lended_equip_query = "SELECT Enum, Renewal_limit, Loan_period, Notice, Flag FROM RESOURCES WHERE Ssn = %s;"
-        cursor.execute(sql_select_lended_equip_query, Ssn)
-        data_equip = cursor.fetchall()
-
-        #-----create equip_list -----
-        equip_list = [[None for x in range(5)]for y in range(len(data_equip))]
-        for i in range(len(data_equip)):
-            for j in range(len(data_equip[i])):
-                equip_list[i][j] = data_equip[i][j]
-
-        #----- select Ename -----
-        for i in range(len(equip_list)):
-            sql_select_Ename_query = "SELECT Ename FROM RESOURCES WHERE Enum = %s;"
-            cursor.execute(sql_select_Ename_query, equip_list[i][0])
-            data_Ename = cursor.fetchall()
-            equip_list[i][0] = data_Ename[0][0]
-        
-        return render_template('lend.html', Name=Name, equip_list=equip_list)
-
-    #----- select lended equipment ------
-    sql_select_lended_equip_query = "SELECT Enum, Renewal_limit, Loan_period, Notice, Flag FROM RESOURCES WHERE Ssn = %s;"
-    cursor.execute(sql_select_lended_equip_query, Ssn)
-    data_equip = cursor.fetchall()
-
-
-    #-----create equip_list -----
-    equip_list = [[None for x in range(5)]for y in range(len(data_equip))]
-    for i in range(len(data_equip)):
-        for j in range(len(data_equip[i])):
-            equip_list[i][j] = data_equip[i][j]
-
-    #----- select Ename -----
-    for i in range(len(equip_list)):
-        sql_select_Ename_query = "SELECT Ename FROM RESOURCES WHERE Enum = %s;"
-        cursor.execute(sql_select_Ename_query, equip_list[i][0])
-        data_Ename = cursor.fetchall()
-        equip_list[i][0] = data_Ename[0][0]
-
-    return render_template('lend.html', Name=Name, equip_list=equip_list)
 
 @app.route('/status/<Name>',methods=['GET'])
 def Status(Name):
@@ -401,6 +234,11 @@ def Status(Name):
         #print(photo_list)
         return render_template("borrow.html",item_list = item_list, photo_list = photo_list,flag_list = flag_list)
 
+@app.route('/history_order',methods=['GET'])
+def HistoryOrder():
+
+    return "ok"
+
 @app.route('/update_status',methods=['GET'])
 def UpdateStatus():
     name = request.values.get('name')
@@ -472,6 +310,7 @@ def UpdateStatus():
 
     return "ok"
 
+
 #-----add resources-----
 @app.route('/addresources',methods=['GET'])
 def AddResources():
@@ -499,28 +338,8 @@ def FlagToZeroOrOne():
     cursor.execute('UPDATE RESOURCES SET Flag = %s WHERE Enum = %s',(Flag, Enum))
     db.commit()
 
-
-#----- other function -----
-def GenerateCode(l,n):
-    #l: number of letters
-    #n: number of numbers
-
-    ret = ""
-    for i in range(l):
-        letter = chr(random.randint(97, 122))
-        Letter = chr(random.randint(65, 90))
-        s = str(random.choice([letter, Letter]))
-        ret += s
-    for i in range(n):
-        number = str(random.randint(0,9))
-        ret += number
-    return ret
-
-def Name2Ssn(Name):
-    cursor.execute('Select Ssn FROM USER WHERE Name=%s',Name)
-    data = str(cursor.fetchone()[0])
-    return data
-
+#-----condition of renew resource-------
+#@app.route('/renewresource',methods = ['GET'])
 def RenewResource(order_num):
     '''
     1. 當A訂單的Order_status = 3(已領取), 且不存在其他 與A訂單同一個Enum的訂單 的Order_status = 0,
@@ -543,23 +362,138 @@ def RenewResource(order_num):
     return Renew_flag
 
 
+@app.route('/test',methods=['GET'])
+def test():
+    '''
+    date = raw_timestamp
+    print(date)
+    delta = datetime.timedelta(days=30)
+    print(date+delta)
+    '''
+    value = request.values.get('value')
+    print(value)
+    print(type(value))
+
+    #cursor.execute("INSERT INTO USER(Name,Ssn) VALUES(%s,%s)",("Luben","E94056178"))
+    #db.commit() 
+    return "ok"
+
+@app.route('/',methods=['GET'])
+def home():
+    cursor.execute("SELECT Dnum, Dname FROM DEPARTMENT")
+    data = cursor.fetchall()
+    #data = json.dumps(data)
+
+    '''
+    content=[] #data type : list
+    for i in range(len(data)):
+        value = list(data[i])
+        content[i] = value
+    '''
+    dept_list= {}
+    for i in data:
+        dept_list[i[0]]=i[1]
+    #print(dept_list)
+
+    cursor.execute("SELECT * FROM RESOURCES WHERE Ename LIKE '%Arduino%' GROUP BY Ssn")
+    data = cursor.fetchall()
+    print(data)
+
+    item_list = {}
+    photo_list = {}
+    for i in data:
+        if i[0] == 1:
+            item_list[i[3]] = [i[2],i[1],i[7],i[4]]
+            photo_list[i[3]] = i[5]
+    print(item_list)
+    print(photo_list)
+
+    return render_template("index.html", dept_list = dept_list, item_list = item_list, photo_list = photo_list)
+
+#-----Other functions-----
+def GenerateCode(l,n):
+    #l: number of letters
+    #n: number of numbers
+
+    ret = ""
+    for i in range(l):
+        letter = chr(random.randint(97, 122))
+        Letter = chr(random.randint(65, 90))
+        s = str(random.choice([letter, Letter]))
+        ret += s
+    for i in range(n):
+        number = str(random.randint(0,9))
+        ret += number
+    return ret
+
+#-----return equipment-----
+def ReturnEquip(Order_num):
+    '''
+     Another version: w/o RESERVATION ; add attribute(Rank) into BORROW
+    1. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
+    2. Update Order_status = 1 where Rank = 1 of this equipment
+    3. Update Rank = Rank - 1 where status != 6 of this equipment
+    '''
+    #-----step1-----
+    cursor.execute('SELECT DATE_FORMAT(Due_date,%s),Ssn,Enum FROM BORROW WHERE Order_num = %s',(date_format,Order_num))
+    #data[0] = Due_date ; date[1] = Ssn ; data[2] = Enum 
+    data = cursor.fetchone()
+    print(data)
+    if timestamp >= data[0]:
+        cursor.execute('UPDATE USER SET Violation = Violation + 1 WHERE Ssn = %s',(data[1]))
+        cursor.execute('SELECT Violation FROM USER WHERE Ssn=%s',data[1])
+        Violation = cursor.fetchone()
+        if Violation[0] >= 2:
+            Punishment(data[1])
+
+    #-----step2-----
+    cursor.execute('UPDATE BORROW SET Order_status = 1 WHERE Enum = %s AND Rank = 1',(data[2]))
+    db.commit()
+
+    #-----step3-----
+    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Rank <> 6',data[2])
+    db.commit()
+
+    return "ok"
+
+def Punishment(Ssn):
+    cursor.execute('SELECT borrowing_time FROM USER WHERE Ssn=%s',Ssn)
+    db.commit()
+    Borrowing_time = cursor.fetchone()
+    print(Borrowing_time[0])
+    if Borrowing_time[0] is None:
+        cursor.execute('UPDATE USER SET Borrowing_time = %s + interval 1 month WHERE Ssn=%s',(timestamp,Ssn))
+        db.commit()
+    else:
+        cursor.execute('UPDATE USER SET Borrowing_time = Borrowing_time + interval 1 month WHERE Ssn=%s',(Ssn))
+        db.commit()
+    return 'ok'
+
+def Name2Ssn(Name):
+    cursor.execute('Select Ssn FROM USER WHERE Name=%s',Name)
+    data = str(cursor.fetchone()[0])
+    return data
+
 if __name__ == '__main__':
-    #----- mysql connection -----
-    f = open("../server/mysqlpasswd.txt",'r')
+    #-----mysql connection-----
+    f = open("mysqlpasswd.txt",'r')
     info=[]
     for line in f:
         line=line.strip('\n')
         info.append(line)
 
     db = pymysql.connect(
-        host=info[0],
-        port=int(info[1]),
-        user=info[2],
-        passwd=info[3],
-        db='ResourcES',
-        charset='utf8'
-    )
+            host=info[0],
+            port=int(info[1]),
+            user=info[2],
+            passwd=info[3],
+            db='ResourcES',
+            charset='utf8'
+            )
+
     #-----create cursor object-----
     cursor = db.cursor()
-    app.debug = True
-    app.run(host="0.0.0.0", port=11290)
+
+    app.debug=True
+
+app.run(host="0.0.0.0" , port = 11240)

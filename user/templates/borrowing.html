@@ -16,7 +16,9 @@
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
-                    <a href="{{ url_for('mall', Name=Name) }}" class="button alt">器材城</a>
+                    <a href="{{ url_for('mall', Name=Name) }}" class="button alt ">器材城</a>
+                    <a href="{{ url_for('member_info', Name=Name) }}" class="button alt"> 會員資料  </a>
+                    <a href="{{ url_for('lend', Name=Name) }}" class="button special" > 管理出借器材 </a>
 				</nav>
                 <a href="{{ url_for('home') }}" class="logo">resourcES</a>
 				<nav class="right">
@@ -40,20 +42,30 @@
 										<table>
 											<thead>
 												<tr>
+                                                    <th>器材圖片</th>
 													<th>器材名稱</th>
                                                     <th>Rank</th>
 													<th>借出日期</th>
 													<th>到期時間</th>
                                                     <th>已續借次數</th>
                                                     <th>訂單狀態</th>
+                                                    <th>我要續借</th>
 												</tr>
 											</thead>
 											<tbody>
                                                 {% for i in range(borrow_list | length) %}
                                                 <tr>
+                                                    <td><img src={{borrow_list[i][7]}} height=100px width=100px></td>
                                                     {% for j in range(6) %}
                                                         <td>{{borrow_list[i][j]}}</td>
                                                     {% endfor %}
+                                                    <td>
+                                                    {% if borrow_list[i][8] == 1 %}
+                                                    <form action="{{ url_for('borrowing', Name=Name) }}" method="POST">
+                                                            <input name='Renewal_flag' type='submit' class='button alt icon fa-check' value='我要續借'></input>
+                                                    </form>
+                                                    {% endif %}
+                                                    </td>
                                                 </tr>
                                                 {% endfor %}
 											</tbody>
@@ -67,10 +79,6 @@
 
 
 							</div>
-                            <div class="12u">
-                                    <a href="#" class="button special" style="margin-right:20%;margin-left:25%"> 管理出借器材 </a>
-                                    <a href="{{ url_for('member_info', Name=Name) }}" class="button"> 會員資料  </a>
-                            </div>
 						</div>
 
 				</div>
