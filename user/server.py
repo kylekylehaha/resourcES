@@ -6,7 +6,8 @@ import time
 import datetime
 
 ts = time.time()
-timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+raw_timestamp = datetime.datetime.fromtimestamp(ts)
+timestamp = raw_timestamp.strftime('%Y-%m-%d %H:%M:%S')
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 date_format = "%Y-%m-%d %T"
@@ -186,6 +187,13 @@ def Add():
 
         if addtype == 'Borrow':
             print("borrow")
+            cursor.execute('SELECT Ssn FROM RESOURCES WHERE Enum=%s',enum)
+            data = str(cursor.fetchone()[0])
+            
+            if data == ssn:
+                print("yourself")
+                return "yourself"
+
             order_num = GenerateCode(4,1)
             try:
                 cursor.execute('INSERT INTO BORROW VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',(order_num, ssn, enum, timestamp, None, 1, 0,0))
@@ -330,7 +338,7 @@ def Status(Name):
     if infotype == 'lend':
         #-----Order is not complete-----
         #print("lend")
-        cursor.execute('SELECT Order_num, Flag, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, MAX(Order_status), MAX(Rank) FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s AND Order_status <> 0 AND Order_status <> 6 GROUP BY R.Enum',ssn)
+        cursor.execute('SELECT Order_num, Flag, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, MAX(Order_status), MAX(Rank), Due_date FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s AND Order_status <> 0 AND Order_status <> 6 GROUP BY R.Enum',ssn)
         data = cursor.fetchall()
         #print(data)
 
@@ -356,14 +364,14 @@ def Status(Name):
                 status = '拒租用'
 
             #print(status)
-            item_list[i[6]] = [i[0],flag,i[2],i[3],i[4],i[5],i[6],i[9],status]
+            item_list[i[6]] = [i[0],flag,i[2],i[3],i[4],i[5],i[6],i[9],status,i[10]]
             photo_list[i[6]] = i[7]
 
         return render_template("status.html",item_list = item_list, photo_list = photo_list)
 
     if infotype == 'borrow':
         print("borrow")
-        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status, Rank, Renewal_times FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE B.Ssn=%s',ssn)
+        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status, Rank, Renewal_times, Due_date FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE B.Ssn=%s AND Order_status <> 6',ssn)
         data = cursor.fetchall()
         #print(data)
 
@@ -390,8 +398,8 @@ def Status(Name):
                 flag = RenewResource(i[0])
                 flag_list[i[5]] = flag
 
-            if i[7] != 0:
-                item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status,i[9]]
+            if i[7] != 0 and i[7] != 1 and i[7] != 2:
+                item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status,i[9],i[10]]
                 photo_list[i[5]] = i[6]
             else:
                 item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status,i[8]]
@@ -499,6 +507,35 @@ def FlagToZeroOrOne():
     cursor.execute('UPDATE RESOURCES SET Flag = %s WHERE Enum = %s',(Flag, Enum))
     db.commit()
 
+#-----return equipment-----
+def ReturnEquip(Order_num):
+    '''
+     Another version: w/o RESERVATION ; add attribute(Rank) into BORROW
+    1. If now > Due_Date, USER.Violation += 1 ; Check if the user.Violation >= 2
+    2. Update Order_status = 1 where Rank = 1 of this equipment
+    3. Update Rank = Rank - 1 where status != 6 of this equipment
+    '''
+    #-----step1-----
+    cursor.execute('SELECT DATE_FORMAT(Due_date,%s),Ssn,Enum FROM BORROW WHERE Order_num = %s',(date_format,Order_num))
+    #data[0] = Due_date ; date[1] = Ssn ; data[2] = Enum 
+    data = cursor.fetchone()
+    print(data)
+    if timestamp >= data[0]:
+        cursor.execute('UPDATE USER SET Violation = Violation + 1 WHERE Ssn = %s',(data[1]))
+        cursor.execute('SELECT Violation FROM USER WHERE Ssn=%s',data[1])
+        Violation = cursor.fetchone()
+        if Violation[0] >= 2:
+            Punishment(data[1])
+
+    #-----step2-----
+    cursor.execute('UPDATE BORROW SET Order_status = 1 WHERE Enum = %s AND Rank = 1',(data[2]))
+    db.commit()
+
+    #-----step3-----
+    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Order_status <> 6',data[2])
+    db.commit()
+
+    return "ok"
 
 #----- other function -----
 def GenerateCode(l,n):

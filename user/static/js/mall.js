@@ -152,6 +152,21 @@ $("#confirm-button").click(()=>{
                     content: '<strong>You have already made a reservation of this equipment.</strong>',
                 }); 
            }
+            else if(response == "yourself"){
+    	    	    $.alert({
+                    theme: 'modern',
+                    icon: 'fa fa-warning',
+                    columnClass: 'col-md-5 col-md-offset-5',
+                    //columnClass: 'large',
+                    closeIcon: true,
+                    type: 'orange',
+                    typeAnimated: true,
+ 
+                    title: 'Alert!',
+                    content: '<strong>This is your own Equipment!!!</strong>',
+                }); 
+            
+            }
             else{
                 console.log("sucess");
                 location.reload();

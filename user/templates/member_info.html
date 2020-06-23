@@ -16,9 +16,9 @@
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
-                    <a href="{{ url_for('mall', Name=Name) }}" class="button alt ">器材城</a>
-                    <a href="{{ url_for('Status', Name=Name) }}" class="button special" > 管理出借器材 </a>
-                    <a href="{{ url_for('UpdateStatus', Name=Name) }}" class="button"> 查看租用器材  </a>
+                    <a href="{{url_for('mall',Name=Name)}}" class="button alt ">器材城</a>
+                    <a id="lend_button" class="button special" > 管理出借器材 </a>
+                    <a id="borrow_button" class="button"> 查看租用器材  </a>
 
 				</nav>
                 <a href="{{ url_for('home') }}" class="logo">resourcES</a>
@@ -85,5 +85,29 @@
 			<script src="{{ url_for('static', filename='js/util.js') }}"></script>
 			<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
+            <script>
+                $("#lend_button").click(()=>{
+                    var current_loc = window.location.href;
+    				var name = decodeURI(current_loc.split('/')[4].split('?')[0]);
+    				
+    				var temp="";
+    				for(i = 0 ; i < current_loc.search('/member') ; i++)
+        				temp+=current_loc[i]
+    				console.log(temp)
+    				window.location.href = temp + "/status/"+name+"?type=lend";
+                })
+
+                $("#borrow_button").click(()=>{
+                    var current_loc = window.location.href;
+    				var name = decodeURI(current_loc.split('/')[4].split('?')[0]);
+    				
+    				var temp="";
+    				for(i = 0 ; i < current_loc.search('/member') ; i++)
+        				temp+=current_loc[i]
+    				console.log(temp)
+    				window.location.href = temp + "/status/"+name+"?type=borrow";
+                })
+ 
+            </script>
 	</body>
 </html>
