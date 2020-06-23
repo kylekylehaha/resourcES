@@ -196,6 +196,7 @@ def Status(Name):
         print("borrow")
         cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status, Rank FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s',ssn)
 
+
     return "ok"
 
 @app.route('/update_status',methods=['GET'])

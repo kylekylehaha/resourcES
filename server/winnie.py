@@ -194,9 +194,40 @@ def Status(Name):
  
     if infotype == 'borrow':
         print("borrow")
-        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status, Rank FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s',ssn)
+        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status, Rank, Renewal_times FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE B.Ssn=%s',ssn)
+        data = cursor.fetchall()
+        print(data)
 
-    return "ok"
+        status = ""
+        item_list = {}
+        photo_list = {}
+        for i in data:
+            if i[7] == 0:
+                status = "預約中"
+            if i[7] == 1:
+                status = "待審核"
+            if i[7] == 2:
+                status = "待領取"
+            if i[7] == 3:
+                status = "已領取"
+            if i[7] == 4:
+                status = "續租審核"
+            if i[7] == 5:
+                status = "拒租用"
+
+            print(status)
+            if i[7] != 0:
+                item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status,i[9]]
+                photo_list[i[5]] = i[6]
+            else:
+                item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status,i[8]]
+                photo_list[i[5]] = i[6]
+            
+        print(item_list)
+        print(photo_list)
+        return render_template("borrow.html",item_list = item_list, photo_list = photo_list)
+
+    #return "ok"
 
 @app.route('/update_status',methods=['GET'])
 def UpdateStatus():

@@ -153,9 +153,10 @@ $("#confirm-button").click(()=>{
                     content: '<strong>You have already made a reservation of this equipment.</strong>',
                 }); 
            }
-            else
+            else{
                 console.log("sucess");
                 location.reload();
-		}
+		    }
+        }   
 	});
 });
