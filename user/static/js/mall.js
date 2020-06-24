@@ -174,3 +174,22 @@ $("#confirm-button").click(()=>{
 		}
 	});
 });
+
+$("a").click((event)=>{
+    var id = $(event.target).attr('id');
+    var current_loc = window.location.href;
+    var name = decodeURI(current_loc.split('/')[4].split('?')[0])
+
+    if(id == "home_btn"){
+        var temp = "";
+        for(i=0; i<current_loc.search('/keyword');i++)
+            temp += current_loc[i]
+        window.location.href = temp+"/member/"+name;
+    }
+    if(id == "mall_btn"){
+        var temp = "";
+        for(i=0; i<current_loc.search('/keyword');i++)
+            temp += current_loc[i]
+        window.location.href = temp+"/mall/"+name;
+    }
+})

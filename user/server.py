@@ -331,7 +331,6 @@ def Status(Name):
     1. Name
     2. query for "lend" information or "borrow" information
     '''
-
     ssn = Name2Ssn(Name)
     infotype = request.values.get('type')
 
@@ -408,7 +407,33 @@ def Status(Name):
         #print(item_list)
         #print(photo_list)
         return render_template("borrow.html",item_list = item_list, photo_list = photo_list,flag_list = flag_list)
+    
+    if infotype == 'history_borrow':
+        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE B.Ssn=%s AND Order_status = 6',ssn)
+        data = cursor.fetchall()
 
+        item_list = {}
+        photo_list = {}
+        for i in data:
+            status = "訂單已完成"
+            item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
+            photo_list[i[5]] = i[6]
+
+        return render_template("history_borrow.html",item_list = item_list, photo_list = photo_list)
+
+    if infotype == 'history_lend':
+        cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE R.Ssn=%s AND Order_status = 6',ssn)
+        data = cursor.fetchall()
+
+        item_list = {}
+        photo_list = {}
+        for i in data:
+            status = "訂單已完成"
+            item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
+            photo_list[i[5]] = i[6]
+        
+        return render_template("history_lend.html",item_list = item_list, photo_list = photo_list)
+        
 @app.route('/update_status',methods=['GET'])
 def UpdateStatus():
     name = request.values.get('name')
@@ -556,6 +581,7 @@ def GenerateCode(l,n):
 def Name2Ssn(Name):
     cursor.execute('Select Ssn FROM USER WHERE Name=%s',Name)
     data = str(cursor.fetchone()[0])
+    print(data)
     return data
 
 def RenewResource(order_num):

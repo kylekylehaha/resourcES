@@ -15,7 +15,8 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
 
 		<title>ResourcES</title>
-   </head>
+    
+    </head>
     <body>
 		<!--器材城-->
 		<nav id="nav_bar" class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -24,14 +25,15 @@
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
     			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       				<li class="nav-item active">
-                        <a class="nav-link" href="{{url_for('member',Name=Name)}}">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" id="home_button" href="#">回到會員資料 <span class="sr-only">(current)</span></a>
       				</li>
       				<li class="nav-item">
-        				<a class="nav-link" href="#">Link</a>
+        				<a class="nav-link" href="#" id="history_button_lend">歷史紀錄</a>
       				</li>
-      				<li class="nav-item">
-        				<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-      				</li>
+                    <!--li class="nav-item">
+        				<a class="nav-link" href="#" id="return_lend">回到訂單資訊</a>
+      				</li-->
+ 
     			</ul>
   			</div>
 		</nav>
@@ -208,52 +210,6 @@
         {% endif %}
 
  
-        <!--jump out window-->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">New</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="recipient-name" class="col-form-label">器材編號:</label>
-                                <input disabled type="text" class="form-control" id="recipient-name">
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="col-form-label">預約: </label>
-
-								<!--div class="form-check">
-									<input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-									<label class="form-check-label" for="exampleRadios1">
-										Default radio
-  									</label>
-								</div-->
-
-								<div class="radio">
-      							    <input checked type="radio" name="optionsRadios" id="optionsRadios1" value="yes">
-                                    <label for="options1">確認預約</label>
-								</div>
-								<div class="radio">
-      							    <input type="radio" name="optionsRadios" id="optionsRadios2" value="no">
-                                    <label for="options2">先不要預約</label>
-								</div> 
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button id="confirm-button" type="submit" class="btn btn-success">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
         <!--img src="./static/equip_img/apple-touch-icon-144x144-precomposed.png" alt="img"-->
         <!--img src="{{ user_img }}" alt="img missing"-->
 

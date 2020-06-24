@@ -9,52 +9,48 @@
     	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
         <!--link css file-->
-        <link rel="stylesheet" href="../static/css/mall.css">
+        <link rel="stylesheet" href="../static/css/status.css">
 
         <!--jquery confirm-->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
 
 		<title>ResourcES</title>
-    </head>
+   </head>
     <body>
 
 		<nav id="nav_bar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-  			<a id="nav_bar_title" class="navbar-brand" href="#">ResourcES</a>
-
-  			<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+  			<a id="nav_bar_title" class="navbar-brand" href="#">租借之器材</a>
+  			
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
     			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       				<li class="nav-item active">
-                        <a class="nav-link" id="home_btn" href="#">Home <span class="sr-only">(current)</span></a>
+        				<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
       				</li>
       				<li class="nav-item">
-                        <a class="nav-link" id="mall_btn" href="#">Mall</a>
+                        <a class="nav-link" href="{{url_for('HistoryOrder')}}">歷史紀錄</a>
       				</li>
     			</ul>
-    			<form class="form-inline my-2 my-lg-0">
-
-				    <input id="search_input" class="form-control mr-sm-2" type="search" placeholder="Keyword" aria-label="Search">
-    			    <button id="search_button" class="btn btn-outline-success my-2 my-sm-0" type="button">Search</button>
-    			</form>
   			</div>
 		</nav>
 
+
+
+		<!--器材城-->
         {% if item_list %}
             {% for i in item_list.keys()%}
 
-                <table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
-                    {% if item_list[i][6] == '需預約'%}
+                <table id="{{item_list[i][0]}}table" style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+                    {% if item_list[i][6] == '預約中'%}
                         <tr>
                             <th>器材照片</th>
-				            <th>器材名稱</th>
-                            <th>所屬人</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
                             <th>可續借次數</th>
                             <th>一次可借用天數</th>
                             <th>注意事項</th>
                             <th>器材編號</th>
                             <th>狀態</th>
-                            <th>已預約人數</th>
-                            <th>目前借用人到期日</th>
-                            <th>預約</th>
+                            <th>目前預約順位</th>
 			            </tr>
 
                         <tr>
@@ -66,36 +62,142 @@
                                 <th> {{j}} </th>
                             {% endfor %}
 
-                            <th>
-                                <button id={{item_list[i][5]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Reservation</button>
-                            </th>
-                    {% else %}
+                    {% endif %}
+ 
+                    {% if item_list[i][6] == '待審核'%}
                         <tr>
                             <th>器材照片</th>
-				            <th>器材名稱</th>
-                            <th>所屬人</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
                             <th>可續借次數</th>
                             <th>一次可借用天數</th>
                             <th>注意事項</th>
                             <th>器材編號</th>
                             <th>狀態</th>
-                            <th>借用</th>
+                            <th>已續借次數</th>
 			            </tr>
-                
+
                         <tr>
                             <th>
                                 <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
                             </th>
-
+                   
                             {% for j in item_list[i] %}
                                 <th> {{j}} </th>
                             {% endfor %}
 
+
+                    {% endif %}
+                    {% if item_list[i][6] == '待領取'%}
+                        <tr>
+                            <th>器材照片</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>狀態</th>
+                            <th>已續借次數</th>
+			            </tr>
+
+                        <tr>
                             <th>
-                                <button id={{item_list[i][5]}} type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Borrow</button>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
                             </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
                         </tr>
                     {% endif %}
+                    {% if item_list[i][6] == '已領取'%}
+                        <tr>
+                            <th>器材照片</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>狀態</th>
+                            <th>已續借次數</th>
+                            <th>歸還日期</th>
+                            
+                            {% if flag_list[i] == 1 %}
+                                <th>我要續借</th>
+                            {% endif %}
+
+			            </tr>
+
+                        <tr>
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
+                            
+                            {% if flag_list[i] == 1 %}
+                                <th>
+                                    <button id="{{item_list[i][0]}}apply_renew_resources" type="button" class="confirm_button btn btn-outline-success">Confirm</button>
+                                </th>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                    
+                    {% if item_list[i][6] == '續租審核中'%}
+                        <tr>
+                            <th>器材照片</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>狀態</th>
+                            <th>已續借次數</th>
+                            <th>歸還日期</th>
+			            </tr>
+
+                        <tr>
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
+                        </tr>
+                    {% endif %}
+ 
+                    {% if item_list[i][6] == '拒租用請如期歸還'%}
+                        <tr>
+                            <th>器材照片</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>狀態</th>
+                            <th>已續借次數</th>
+                            <th>歸還日期</th>
+			            </tr>
+
+                        <tr>
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
+                        </tr>
+                    {% endif %}
+ 
+
 		        </table>
 
             {% endfor %}
@@ -177,7 +279,7 @@
 		<script src="https://kit.fontawesome.com/af046df13d.js" crossorigin="anonymous"></script>
 
 		<!--link to javascrip file-->
-		<script src="../static/js/mall.js"></script>
+		<script src="../static/js/status.js"></script>
 
 	</body>
 </html>

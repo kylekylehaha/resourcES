@@ -31,3 +31,49 @@ $("button").click((evt)=>{
         }
 	});
 })
+
+$("a").click((event)=>{
+    var id = $(event.target).attr('id');
+    console.log(id);
+    var current_loc = window.location.href;
+	var name = decodeURI(current_loc.split('/')[4].split("?")[0]);
+ 
+    if(id == "home_button"){
+    	var temp="";
+    	for(i = 0 ; i < current_loc.search('/status') ; i++)
+        	temp+=current_loc[i]
+    	console.log(temp)
+    	window.location.href = temp + "/member_info/"+name;
+    }
+	
+	if(id == "history_button_borrow"){
+    	var temp="";
+    	for(i = 0 ; i < current_loc.search('/status') ; i++)
+        	temp+=current_loc[i]
+    	console.log(temp)
+    	window.location.href = temp + "/status/"+name+"?type=history_borrow";
+    }    
+    if(id == "history_button_lend"){
+   	    var temp="";
+    	for(i = 0 ; i < current_loc.search('/status') ; i++)
+        	temp+=current_loc[i]
+        console.log(temp)
+    	window.location.href = temp + "/status/"+name+"?type=history_lend";
+    }
+    if(id == "return_borrow"){
+    	var temp="";
+    	for(i = 0 ; i < current_loc.search('/status') ; i++)
+        	temp+=current_loc[i]
+        console.log(temp)
+    	window.location.href = temp + "/status/"+name+"?type=borrow";
+    }
+    if(id == "return_lend"){
+    	var temp="";
+    	for(i = 0 ; i < current_loc.search('/status') ; i++)
+        	temp+=current_loc[i]
+        console.log(temp)
+    	window.location.href = temp + "/status/"+name+"?type=lend";
+    }
+
+
+})

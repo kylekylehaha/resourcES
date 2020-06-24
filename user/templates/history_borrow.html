@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+    <head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+    	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <!--link css file-->
+        <link rel="stylesheet" href="../static/css/status.css">
+
+        <!--jquery confirm-->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+        
+		<title>ResourcES</title>
+   </head>
+    <body onload>
+
+		<nav id="nav_bar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+  			<a id="nav_bar_title" class="navbar-brand" href="#">租借器材歷史紀錄</a>
+  			
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+    			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      				<li class="nav-item active">
+                        <a class="nav-link" id="home_button" href="#">回到會員資料 <span class="sr-only">(current)</span></a>
+      				</li>
+      				<li class="nav-item">
+                        <a class="nav-link" href="#" id="return_borrow">回到訂單資訊</a>
+      				</li>
+    			</ul>
+  			</div>
+		</nav>
+
+
+
+		<!--器材城-->
+        {% if item_list %}
+            {% for i in item_list.keys()%}
+
+                <table id="{{item_list[i][0]}}table" style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+                    {% if item_list[i][6] == '訂單已完成'%}
+                        <tr>
+                            <th>器材照片</th>
+                            <th>訂單編號</th>
+                            <th>器材名稱</th>
+                            <th>可續借次數</th>
+                            <th>一次可借用天數</th>
+                            <th>注意事項</th>
+                            <th>器材編號</th>
+                            <th>狀態</th>
+			            </tr>
+
+                        <tr>
+                            <th>
+                                <img class='photo' src={{photo_list[i]}} alt='photo missing' height=100px width=100px>
+                            </th>
+                   
+                            {% for j in item_list[i] %}
+                                <th> {{j}} </th>
+                            {% endfor %}
+
+                    {% endif %}
+
+		        </table>
+
+            {% endfor %}
+        
+        {% else %}
+            <p>查無資料</p>    
+
+        {% endif %}
+
+ 
+        <!--img src="./static/equip_img/apple-touch-icon-144x144-precomposed.png" alt="img"-->
+        <!--img src="{{ user_img }}" alt="img missing"-->
+
+
+		<!--select class="custom-select" id="sensor_list">
+            <option selected>select department</option>
+            {% for i in dept_list %}
+                <option value={{i}}>{{dept_list[i]}}</option>
+            {% endfor %}
+		</select-->		
+
+
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <!--jquery confirm-->
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
+		<!--icons-->
+		<script src="https://kit.fontawesome.com/af046df13d.js" crossorigin="anonymous"></script>
+
+		<!--link to javascrip file-->
+		<script src="../static/js/status.js"></script>
+
+	</body>
+</html>

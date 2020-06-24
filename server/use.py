@@ -452,7 +452,7 @@ def ReturnEquip(Order_num):
     db.commit()
 
     #-----step3-----
-    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Rank <> 6',data[2])
+    cursor.execute('UPDATE BORROW SET Rank = Rank - 1 WHERE Enum = %s AND Order_status <> 6',data[2])
     db.commit()
 
     return "ok"
