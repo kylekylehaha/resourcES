@@ -163,13 +163,17 @@ def Add():
     ssn = Name2Ssn(name)
 
     if value == "yes":
-        if addtype == 'Reservation':
+        cursor.execute('SELECT Violation FROM USER WHERE Ssn=%s',ssn)
+        data = int(cursor.fetchone()[0])
 
+        if data >= 2:
+            return "inviolation"
+
+        if addtype == 'Reservation':
             cursor.execute('SELECT Order_status FROM BORROW WHERE Enum=%s AND Ssn=%s AND Order_status <> 6',(enum,ssn))
             data = cursor.fetchone()
            
             if data is None:
-                
                 cursor.execute('SELECT MAX(Rank) FROM BORROW WHERE Enum = %s',(enum))
                 data = int(cursor.fetchone()[0])
 
@@ -182,7 +186,7 @@ def Add():
                     if e.args[0] == PYMYSQL_DUPLICATE_ERROR:
                         return("duplicated")
             else:
-                print("cannotreserved")
+                #print("cannotreserved")
                 return "cannotreserved"
 
         if addtype == 'Borrow':

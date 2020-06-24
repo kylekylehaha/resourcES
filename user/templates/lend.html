@@ -134,7 +134,7 @@
 									<hr />
 							</div>
 							<div class="12u">
-								<!-- Table -->
+		                            <!-- Table -->
 									<h3>目前已出租的器材</h3>
 
 									<div class="table-wrapper">
@@ -151,9 +151,15 @@
 											<tbody>
                                                 {% for i in range(equip_list | length) %}
                                                 <tr>
-                                                    {% for j in range(5) %}
+                                                    {% for j in range(4) %}
                                                     <td>{{equip_list[i][j]}}</td>
                                                     {% endfor %}
+                                                    {% if equip_list[i][4] == 1 %}
+                                                    <td>目前提供外借</td>
+                                                    {% endif %}
+                                                    {% if equip_list[i][4] == 0 %}
+                                                    <td>目前不提供外借</td>
+                                                    {% endif %}
                                                 </tr>
                                                 {% endfor %}
 											</tbody>

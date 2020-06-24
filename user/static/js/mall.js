@@ -167,6 +167,23 @@ $("#confirm-button").click(()=>{
                 }); 
             
             }
+            else if(response == "inviolation"){
+    	    	    $.alert({
+                    theme: 'modern',
+                    icon: 'fa fa-warning',
+                    columnClass: 'col-md-5 col-md-offset-5',
+                    //columnClass: 'large',
+                    closeIcon: true,
+                    type: 'orange',
+                    typeAnimated: true,
+ 
+                    title: 'Alert!',
+                    content: '<strong>You are in Violation.</strong>',
+                }); 
+            
+            }
+
+
             else{
                 console.log("sucess");
                 location.reload();
