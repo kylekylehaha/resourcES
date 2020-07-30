@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
 		<!-- Bootstrap CSS -->
     	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
@@ -18,25 +22,17 @@
     
     </head>
     <body>
-		<!--器材城-->
-		<nav id="nav_bar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-  			<a id="nav_bar_title" class="navbar-brand" href="#">器材出借狀況與審核</a>
-  			
-            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-    			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-      				<li class="nav-item active">
-                        <a class="nav-link" id="home_button" href="#">回到會員資料 <span class="sr-only">(current)</span></a>
-      				</li>
-      				<li class="nav-item">
-        				<a class="nav-link" href="#" id="history_button_lend">歷史紀錄</a>
-      				</li>
-                    <!--li class="nav-item">
-        				<a class="nav-link" href="#" id="return_lend">回到訂單資訊</a>
-      				</li-->
- 
-    			</ul>
-  			</div>
-		</nav>
+
+		<!-- Header -->
+			<header id="header">
+				<nav class="left">
+                    <a href="{{ url_for('member',Name=Name) }}" class="logo" style="font-family:Comic Sans MS">Loan Approval</a>
+			</nav>
+				<nav class="right">
+                    <a id="home_button" href="#" class="button alt" > 回到會員資料 </a>
+                    <a id="history_button_lend" href="#" class="button special"> 歷史紀錄  </a>
+				</nav>
+			</header>
 
         {% if item_list %}
             {% for i in item_list.keys()%}

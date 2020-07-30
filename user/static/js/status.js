@@ -64,14 +64,14 @@ $("a").click((event)=>{
     	var temp="";
     	for(i = 0 ; i < current_loc.search('/status') ; i++)
         	temp+=current_loc[i]
-        console.log(temp)
+        console.log(temp);
     	window.location.href = temp + "/status/"+name+"?type=borrow";
     }
     if(id == "return_lend"){
     	var temp="";
     	for(i = 0 ; i < current_loc.search('/status') ; i++)
         	temp+=current_loc[i]
-        console.log(temp)
+        console.log(temp);
     	window.location.href = temp + "/status/"+name+"?type=lend";
     }
 

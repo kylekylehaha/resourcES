@@ -5,6 +5,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+		<title>resourcES</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
 		<!-- Bootstrap CSS -->
     	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
@@ -16,24 +21,18 @@
         
 		<title>ResourcES</title>
    </head>
-    <body onload>
+    <body>
 
-		<nav id="nav_bar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-  			<a id="nav_bar_title" class="navbar-brand" href="#">租借器材歷史紀錄</a>
-  			
-            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-    			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-      				<li class="nav-item active">
-                        <a class="nav-link" id="home_button" href="#">回到會員資料 <span class="sr-only">(current)</span></a>
-      				</li>
-      				<li class="nav-item">
-                        <a class="nav-link" href="#" id="return_borrow">回到訂單資訊</a>
-      				</li>
-    			</ul>
-  			</div>
-		</nav>
-
-
+		<!-- Header -->
+			<header id="header">
+				<nav class="left">
+                	<a href="#" class="logo" style="font-family:Comic Sans MS">Borrowing History</a>
+			</nav>
+				<nav class="right">
+                    <a href="#" id="home_button" class="button alt ">回到會員資料</a>
+                    <a href="#" id="return_borrow" class="button special" > 回到訂單資訊 </a>
+				</nav>
+			</header>
 
 		<!--器材城-->
         {% if item_list %}

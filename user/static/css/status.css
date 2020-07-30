@@ -6,8 +6,9 @@ table{
 #nav_bar_title{
     font-family: comic sans ms;
     font-weight: bold;
-    color: #FFFFFF;
+    color: #000000;
 	font-size: 30px;
+    padding-right: 10px;
 }
 
 #nav_bar{

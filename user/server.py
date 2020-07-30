@@ -77,7 +77,7 @@ def member(Name):
 def member_info(Name):
     #----- select Name information -----
     
-    sql_select_query = "SELECT Name, Ssn, Department, Email, Violation FROM USER WHERE Name = %s;"
+    sql_select_query = "SELECT Name, Ssn, Department, Email, Violation, Borrowing_time FROM USER WHERE Name = %s"
     cursor.execute(sql_select_query, Name)
     data = cursor.fetchall()
     S_Name = data[0][0] 
@@ -85,11 +85,13 @@ def member_info(Name):
     S_Dept = data[0][2]
     S_Email = data[0][3]
     S_Violation = data[0][4]
+    print (S_Violation)
+    S_Borrowing_time = data[0][5]
     sql_selectname_query = "SELECT Dname FROM DEPARTMENT WHERE Dnum = %s"
     cursor.execute(sql_selectname_query, S_Dept)
     data_dept = cursor.fetchall()
     S_Dname = data_dept[0][0]
-    return render_template('member_info.html', Name=S_Name, Ssn=S_Ssn, Dept=S_Dname, Email=S_Email, Violation=S_Violation )
+    return render_template('member_info.html', Name=S_Name, Ssn=S_Ssn, Dept=S_Dname, Email=S_Email, Violation=S_Violation , Borrowing_time=S_Borrowing_time)
     
 @app.route('/mall/<Name>', methods=['GET'])
 def mall(Name):
@@ -355,6 +357,11 @@ def Status(Name):
             else:
                 flag = "no"
 
+            
+            status_name = ['待審核','待領取','已領取','續租審核','拒租用']
+            status = status_name[i[8]-1]
+            
+            '''
             if i[8] == 1:
                 status = '待審核'
             if i[8] == 2:
@@ -365,7 +372,7 @@ def Status(Name):
                 status = '續租審核'
             if i[8] == 5:
                 status = '拒租用'
-
+            '''
             #print(status)
             item_list[i[6]] = [i[0],flag,i[2],i[3],i[4],i[5],i[6],i[9],status,i[10]]
             photo_list[i[6]] = i[7]
@@ -383,6 +390,11 @@ def Status(Name):
         photo_list = {}
         flag_list = {}
         for i in data:
+            
+            status_name = ['預約中','待審核','待領取','已領取','續租審核中','拒租用請如期歸還']
+            status = status_name[i[7]]
+
+            '''            
             if i[7] == 0:
                 status = "預約中"
             if i[7] == 1:
@@ -396,6 +408,7 @@ def Status(Name):
             if i[7] == 5:
                 status = "拒租用請如期歸還"
 
+            '''
             #print(status)
             if i[7] == 3:
                 flag = RenewResource(i[0])
@@ -413,6 +426,7 @@ def Status(Name):
         return render_template("borrow.html",item_list = item_list, photo_list = photo_list,flag_list = flag_list)
     
     if infotype == 'history_borrow':
+        print("history_borrow")
         cursor.execute('SELECT Order_num, Ename, Renewal_limit, Loan_period, Notice, R.Enum, Ephoto, Order_status FROM RESOURCES AS R JOIN BORROW AS B ON R.Enum=B.Enum WHERE B.Ssn=%s AND Order_status = 6',ssn)
         data = cursor.fetchall()
 
@@ -420,9 +434,14 @@ def Status(Name):
         photo_list = {}
         for i in data:
             status = "訂單已完成"
+            item_list[i[0]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
+            photo_list[i[0]] = i[6]
+            
+            '''
+            status = "訂單已完成"
             item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
             photo_list[i[5]] = i[6]
-
+            '''
         return render_template("history_borrow.html",item_list = item_list, photo_list = photo_list)
 
     if infotype == 'history_lend':
@@ -433,8 +452,8 @@ def Status(Name):
         photo_list = {}
         for i in data:
             status = "訂單已完成"
-            item_list[i[5]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
-            photo_list[i[5]] = i[6]
+            item_list[i[0]] = [i[0],i[1],i[2],i[3],i[4],i[5],status]
+            photo_list[i[0]] = i[6]
         
         return render_template("history_lend.html",item_list = item_list, photo_list = photo_list)
         
